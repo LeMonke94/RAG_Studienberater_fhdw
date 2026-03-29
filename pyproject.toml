@@ -3,9 +3,28 @@ name = 'fhdw-rag-studienberater'
 version = '0.2.0'
 requires-python = '>=3.11'
 
-[tool.setuptools.packages.find]
-where = ['.']
-include = ['app']
+[tool.setuptools]
+packages = [
+    'app',
+    'app.config',
+
+    'app.pipelines',
+    'app.pipelines.generation',
+    'app.pipelines.ingestion',
+    'app.pipelines.retrieval',
+
+    'app.shared',
+    'app.shared.domain',
+    'app.shared.domain.models',
+    'app.shared.domain.ports',
+    'app.shared.infrastructure',
+    'app.shared.infrastructure.embeddings',
+    'app.shared.infrastructure.llm',
+    'app.shared.infrastructure.vectorstores',
+
+    'app.ui'
+
+]
 
 [tool.pytest.ini_options]
 pythonpath = ['.']

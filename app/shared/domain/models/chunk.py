@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-# Datenklasse für Chunk
+# Datenklasse für ein Chunk
 @dataclass
 class Chunk:
     chunk_id: str

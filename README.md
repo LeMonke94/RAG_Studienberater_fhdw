@@ -38,6 +38,7 @@ ui/
 | Typ-Prüfung       | mypy                   | Statische Typprüfung vor der Ausführung       |
 | Versionskontrolle | Git                    | Code-Versionierung und Zusammenarbeit         |
 | Projektdefinition | pyproject.toml         | Metadaten, Abhängigkeiten, Tool-Konfiguration |
+langchain-text-splitters-1.1.1
 
 
 app/                                # Enthält den gesamten Python-Code

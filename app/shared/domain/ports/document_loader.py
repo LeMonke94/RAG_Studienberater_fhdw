@@ -1,6 +1,5 @@
 # Imports
 from abc import ABC, abstractmethod
-from typing import List
 from app.shared.domain.models import Document
 
 # Abstrakte Klasse für einen Dokument loader

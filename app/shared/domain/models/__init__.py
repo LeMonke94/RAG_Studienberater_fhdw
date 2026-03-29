@@ -4,6 +4,7 @@ from .chunk import Chunk
 from .document import Document
 from .query import Query
 from .retrieval_result import RetrievalResult
+from .scored_chunk import ScoredChunk
 
 # Export für *
 __all__ = {
@@ -11,5 +12,6 @@ __all__ = {
     'Chunk',
     'Document',
     'Query',
-    'RetrievalResult'
+    'RetrievalResult',
+    'ScoredChunk'
 }

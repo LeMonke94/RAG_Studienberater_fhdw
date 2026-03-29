@@ -1,5 +1,5 @@
 # Imports
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional
 
 # Datenklasse für Chunk

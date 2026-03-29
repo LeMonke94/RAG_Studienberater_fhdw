@@ -8,4 +8,3 @@ class LLMPort(ABC):
     def generate(self, prompt: str) -> str:
         """Generiert eine Antwort auf den gegebenen Prompt"""
         pass
-

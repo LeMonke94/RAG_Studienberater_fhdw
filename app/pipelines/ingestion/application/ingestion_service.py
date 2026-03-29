@@ -5,7 +5,7 @@ from app.shared.domain.ports import DocumentLoaderPort, EmbeddingPort, VectorSto
 from app.pipelines.ingestion.infrastructure.loaders import TextCleaner
 from app.pipelines.ingestion.domain.services.chunking_service import ChunkingService
 
-# 
+# Ingestion Pipeline zusammenstellen
 class IngestionService():
 
     def __init__(self, loader: DocumentLoaderPort, text_cleaner: TextCleaner, chunking_service: ChunkingService, embedder: EmbeddingPort, vector_store: VectorStorePort):

@@ -1,7 +1,7 @@
 # Imports
 from abc import ABC, abstractmethod
 
-# Abstrakte Klasse für ein LLM
+# Abstrakte Klasse für ein LLM-Modell
 class LLMPort(ABC):
 
     @abstractmethod

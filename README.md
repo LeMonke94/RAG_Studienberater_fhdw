@@ -87,3 +87,17 @@ QDRANT_ENDPOINT=https://deine-url.qdrant.io
 QDRANT_API_KEY=dein_api_key
 QDRANT_COLLECTION_NAME=fhdw_studienberater
 ```
+
+## Verwendung
+
+**Schritt 1 — Dokumente einlesen**
+
+FHDW-PDFs in `data/raw/pdf/` ablegen, dann:
+```bash
+python scripts/ingest.py
+```
+
+**Schritt 2 — Pipeline testen**
+```bash
+python scripts/test_retrieval.py
+```

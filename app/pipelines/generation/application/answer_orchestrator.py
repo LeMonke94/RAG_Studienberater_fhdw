@@ -14,7 +14,7 @@ class AnswerOrchestrator:
         self.guardrail = guardrail
         self.llm = llm
 
-    def run_anwer(self, frage: str) -> Answer:
+    def run_answer(self, frage: str) -> Answer:
         """Nimmt eine Nutzerfrage und gibt eine belegte Antwort zurück."""
 
         # Relevante Chunks holen

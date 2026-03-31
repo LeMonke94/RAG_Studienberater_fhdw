@@ -22,6 +22,8 @@ class GroundingService:
 
         ANTWORT:"""
 
+        return prompt
+
     def _format_chunks(self, result: RetrievalResult) -> str:
         teile = []
         for i, scored_chunk in enumerate(result.chunks):

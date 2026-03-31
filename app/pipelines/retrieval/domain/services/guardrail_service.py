@@ -4,7 +4,7 @@ from app.shared.domain.models import RetrievalResult
 # Guardrail service
 class GuardrailService:
 
-    def __init__(self, min_score: float = 0.7):
+    def __init__(self, min_score: float = 0.5):
         self.min_score = min_score
 
     # Prüft ob Chunks evidenz haben

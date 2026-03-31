@@ -32,7 +32,7 @@ class QdrantStore(VectorStorePort):
         points = []
         for chunk in chunks:
             point = PointStruct(
-                id=str(uuid.uuid4()),
+                id=str(uuid.uuid5(uuid.NAMESPACE_DNS, chunk.chunk_id)),
                 vector=chunk.vektor,
                 payload= {
                     'chunk_id': chunk.chunk_id,

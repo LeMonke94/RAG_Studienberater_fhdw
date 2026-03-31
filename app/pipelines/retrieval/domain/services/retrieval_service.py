@@ -20,6 +20,11 @@ class RetrievalService:
             top_k=top_k
         )
 
+        # Temporär zum Debuggen:
+        print(f"Gefundene Chunks: {len(scored_chunks)}")
+        for sc in scored_chunks:
+            print(f"  Score: {sc.score} | Text: {sc.chunk.text[:50]}")
+
         hat_evidenz = len(scored_chunks) > 0
 
         return RetrievalResult(

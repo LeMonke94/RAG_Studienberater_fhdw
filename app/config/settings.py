@@ -20,9 +20,12 @@ class Settings(BaseSettings):
     chunk_overlap: int = 50
     top_k: int = 5
 
+    # Guardrail
+    min_score: float = 0.5
+
     # Vektorstore 
     # (Später erweiterbar zb um FAISS oder ChromaDB zu testen)
-    vector_store: Literal['qdrant']
+    vector_store: Literal['qdrant'] = 'qdrant'
 
     class Config:
         env_file = '.env'

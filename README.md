@@ -41,19 +41,49 @@ ui/
 langchain-text-splitters-1.1.1
 
 
-app/                                # Enthält den gesamten Python-Code
-    shared/                         # Alles was alle drei Pipelines (Ingestion, Retrieval, Generation) gemeinsam nutzen
-        domain/                         # Abstrakte Interfaces (Ports) und Datenmodelle die in allen Pipelines verwendet werden
-            models/                         # Datenstrukturen
-            ports/                          # Abstrakte Interfaces
-        infrastructure/                 # Gemeinsame Adapter
-            vectorstores/
-            llm/
-            embeddings/
+# Installationsanweisung:
 
-    pipelines/                      # Die drei Verarbeitungsstränge
-        ingestion/                      # Dokumente einlesen
-            domain/                         #  Ingestion-Logik
-                services/
-            infrastructure/                 # Ingestion-Adapter
-            application/
+## Voraussetzungen
+
+- Python 3.11+
+- [Ollama](https://ollama.com) installiert und gestartet
+- [Qdrant Cloud](https://cloud.qdrant.io) Account
+
+## Installation
+
+**1. Repository klonen**
+```bash
+git clone 
+cd RAG_Studienberater
+```
+
+**2. Virtuelle Umgebung erstellen**
+```bash
+python -m venv .venv
+
+# Windows:
+.venv\Scripts\activate
+```
+
+**3. Pakete installieren**
+```bash
+pip install -r requirements.txt
+pip install -e .
+```
+
+**4. Ollama Modelle herunterladen**
+```bash
+ollama pull qwen2.5:7b
+ollama pull bge-m3
+```
+
+**5. Umgebungsvariablen konfigurieren**
+
+Kopiere `.env.example` zu `.env` und trage deine Zugangsdaten ein:
+
+`.env` befüllen:
+```
+QDRANT_ENDPOINT=https://deine-url.qdrant.io
+QDRANT_API_KEY=dein_api_key
+QDRANT_COLLECTION_NAME=fhdw_studienberater
+```

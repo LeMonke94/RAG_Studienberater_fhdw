@@ -5,8 +5,8 @@ from app.shared.domain.models import RetrievalResult
 class GroundingService:
 
     # Prompt String vorbereiten
-    def baue_prompt(self, frage: str, result: RetrievalResult) -> str:
-        kontext = self._formatiere_chunks(result)
+    def build_prompt(self, frage: str, result: RetrievalResult) -> str:
+        kontext = self._format_chunks(result)
 
         prompt = f"""
         Du bist ein hilfreicher Studienberater der FHDW.
@@ -22,7 +22,7 @@ class GroundingService:
 
         ANTWORT:"""
 
-    def _formatiere_chunks(self, result: RetrievalResult) -> str:
+    def _format_chunks(self, result: RetrievalResult) -> str:
         teile = []
         for i, scored_chunk in enumerate(result.chunks):
             teil = (

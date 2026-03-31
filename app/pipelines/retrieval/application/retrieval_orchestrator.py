@@ -10,10 +10,10 @@ class RetrievalOrchestrator:
         self.retrieval_service = retrieval_service
         self.guardrail_service = guardrail_service
 
-    def retrieve(self, frage: str, top_k: int = 5) -> RetrievalResult:
+    def run_retrieve(self, frage: str, top_k: int = 5) -> RetrievalResult:
         """Holt relevante Chunks und prüft die Evidenz"""
         result = self.retrieval_service.retrieve(frage, top_k)
 
-        if not self.guardrail_service.hat_ausreichend_evidenz(result):
+        if not self.guardrail_service.check_evidence(result):
             return RetrievalResult(chunks=[], hat_evidenz=False)
         return result

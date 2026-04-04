@@ -1,0 +1,216 @@
+{
+  "version": "1.0",
+  "beschreibung": "Evaluations-Testset für den RAG-Studienberater FHDW. Fragen in drei Kategorien: ki_regelungen (aktuell ingested), studienberatung (zukünftige Dokumente), off_topic (Guardrail-Tests).",
+  "fragen": [
+    {
+      "id": "Q01",
+      "kategorie": "ki_regelungen",
+      "frage": "Welche KI-Tools sind an der FHDW offiziell erlaubt?",
+      "schlüsselwörter": ["erlaubt", "KI", "Tools"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q02",
+      "kategorie": "ki_regelungen",
+      "frage": "Was passiert bei einem Verstoß gegen die KI-Richtlinien der FHDW?",
+      "schlüsselwörter": ["Verstoß", "Konsequenzen", "Richtlinien"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q03",
+      "kategorie": "ki_regelungen",
+      "frage": "Wie muss ich den Einsatz von KI in meiner Hausarbeit kennzeichnen?",
+      "schlüsselwörter": ["kennzeichnen", "deklarieren", "Hausarbeit", "Nutzung"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q04",
+      "kategorie": "ki_regelungen",
+      "frage": "Darf ich ChatGPT für das Schreiben von Seminararbeiten verwenden?",
+      "schlüsselwörter": ["ChatGPT", "Seminararbeit", "erlaubt", "verwenden"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q05",
+      "kategorie": "ki_regelungen",
+      "frage": "Welche Konsequenzen hat nicht-deklarierte KI-Nutzung bei Prüfungsleistungen?",
+      "schlüsselwörter": ["Konsequenzen", "deklariert", "Prüfung", "Täuschung"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q06",
+      "kategorie": "ki_regelungen",
+      "frage": "Gelten die KI-Regelungen für alle Studiengänge und Prüfungsformen?",
+      "schlüsselwörter": ["Studiengänge", "Prüfungsformen", "gilt", "alle"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q07",
+      "kategorie": "ki_regelungen",
+      "frage": "Darf ich KI-Tools für Programmieraufgaben im Studium einsetzen?",
+      "schlüsselwörter": ["Programmierung", "Code", "Aufgaben", "einsetzen"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q08",
+      "kategorie": "ki_regelungen",
+      "frage": "Was versteht die FHDW unter erlaubter und nicht erlaubter KI-Nutzung?",
+      "schlüsselwörter": ["erlaubt", "nicht erlaubt", "Unterschied", "Nutzung"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q09",
+      "kategorie": "ki_regelungen",
+      "frage": "Ab wann gelten die neuen KI-Regelungen an der FHDW?",
+      "schlüsselwörter": ["ab", "gültig", "Datum", "2025"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q10",
+      "kategorie": "ki_regelungen",
+      "frage": "Was muss ich beim Einsatz von KI-generierten Texten beachten?",
+      "schlüsselwörter": ["generiert", "Text", "beachten", "Nutzung"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q11",
+      "kategorie": "studienberatung",
+      "frage": "Welche Bachelorstudiengänge bietet die FHDW an?",
+      "schlüsselwörter": ["Bachelor", "Studiengänge", "Wirtschaft", "Informatik"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q12",
+      "kategorie": "studienberatung",
+      "frage": "Wie hoch sind die monatlichen Studiengebühren an der FHDW?",
+      "schlüsselwörter": ["Gebühren", "Euro", "monatlich", "Kosten"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q13",
+      "kategorie": "studienberatung",
+      "frage": "Bis wann muss ich mich für ein Studium an der FHDW bewerben?",
+      "schlüsselwörter": ["Bewerbungsfrist", "Deadline", "bewerben", "Datum"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q14",
+      "kategorie": "studienberatung",
+      "frage": "Wie lange dauert das duale Bachelor-Studium an der FHDW?",
+      "schlüsselwörter": ["Regelstudienzeit", "Jahre", "Semester", "Dauer"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q15",
+      "kategorie": "studienberatung",
+      "frage": "An welchen Standorten kann ich an der FHDW studieren?",
+      "schlüsselwörter": ["Standort", "Bielefeld", "Bergisch Gladbach", "Paderborn"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q16",
+      "kategorie": "studienberatung",
+      "frage": "Was ist ein duales Studium und wie funktioniert es an der FHDW?",
+      "schlüsselwörter": ["dual", "Praxisphasen", "Unternehmen", "Theorie"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q17",
+      "kategorie": "studienberatung",
+      "frage": "Welche Zulassungsvoraussetzungen brauche ich für die Bewerbung an der FHDW?",
+      "schlüsselwörter": ["Abitur", "Fachhochschulreife", "Voraussetzungen", "Zulassung"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q18",
+      "kategorie": "studienberatung",
+      "frage": "Gibt es Stipendien oder Fördermöglichkeiten für ein Studium an der FHDW?",
+      "schlüsselwörter": ["Stipendium", "Förderung", "BAföG", "finanziell"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q19",
+      "kategorie": "studienberatung",
+      "frage": "Wie ist der typische Studienablauf im ersten Semester an der FHDW?",
+      "schlüsselwörter": ["erstes Semester", "Ablauf", "Vorlesungen", "Module"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q20",
+      "kategorie": "studienberatung",
+      "frage": "Was sind die Praxisphasen im dualen Studium und wie sind sie strukturiert?",
+      "schlüsselwörter": ["Praxisphase", "Unternehmen", "Wochen", "Struktur"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q21",
+      "kategorie": "studienberatung",
+      "frage": "Bietet die FHDW auch Masterstudiengänge an?",
+      "schlüsselwörter": ["Master", "Masterstudium", "MBA", "weiterführend"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q22",
+      "kategorie": "studienberatung",
+      "frage": "Ist die FHDW staatlich anerkannt und akkreditiert?",
+      "schlüsselwörter": ["staatlich anerkannt", "Akkreditierung", "Hochschule"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q23",
+      "kategorie": "off_topic",
+      "frage": "Was ist die Hauptstadt von Frankreich?",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q24",
+      "kategorie": "off_topic",
+      "frage": "Wie wird das Wetter morgen in Bielefeld?",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q25",
+      "kategorie": "off_topic",
+      "frage": "Kannst du mir ein Rezept für Spaghetti Carbonara empfehlen?",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q26",
+      "kategorie": "off_topic",
+      "frage": "Wer hat die letzte Fußball-Weltmeisterschaft gewonnen?",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q27",
+      "kategorie": "off_topic",
+      "frage": "Wie lautet der aktuelle Bitcoin-Kurs?",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q28",
+      "kategorie": "off_topic",
+      "frage": "Erkläre mir die Relativitätstheorie von Einstein.",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q29",
+      "kategorie": "off_topic",
+      "frage": "Schreibe mir ein Python-Skript zum Sortieren einer Liste.",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q30",
+      "kategorie": "off_topic",
+      "frage": "Was ist die beste Pizzeria in Düsseldorf?",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    }
+  ]
+}

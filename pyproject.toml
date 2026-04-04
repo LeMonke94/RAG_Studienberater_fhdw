@@ -6,14 +6,12 @@ readme = "README.md"
 requires-python = '>=3.11'
 dependencies = [
     'beautifulsoup4>=4.14,<5',
-    'langchain>=1.2,<2',
     'langchain-ollama>=1.0,<2',
     'langchain-text-splitters>=1.1,<2',
     'ollama>=0.6,<1',
     'pdfplumber>=0.11,<1',
     'pydantic-settings>=2.13,<3',
     'qdrant-client>=1.17,<2',
-    'python-dotenv>=1.2,<2',
     'requests>=2.33,<3',
     'streamlit>=1.55,<2'
 ]
@@ -23,6 +21,7 @@ dev = [
     "mypy>=1.19,<2",
     "pytest>=9,<10",
     "ruff>=0.15,<1",
+    "pytest-cov>=6,<7",
 ]
 
 [build-system]
@@ -37,3 +36,10 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+strict = true

@@ -6,6 +6,7 @@ data/processed/
 data/raw/
 
 .env
+.claude
 *.egg-info/
 
 # VS Code

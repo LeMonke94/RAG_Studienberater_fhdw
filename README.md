@@ -1,24 +1,4 @@
-# Architektur Konzepte
-
-domain/
-├── models/    → Definition der Datenstrukturen
-│               werden überall durchgereicht
-├── ports/     → Interfaces für externe Tools
-│               werden in infrastructure implementiert
-└── services/  → Fachlogik in reinem Python
-                werden in application aufgerufen
-
-infrastructure/
-└── implementiert die Ports mit echten Tools
-    VectorStorePort → QdrantStore (Qdrant)
-    LLMPort         → OllamaClient (Ollama)
-
-application/
-└── koordiniert services + infrastructure
-    "hole Chunks (infrastructure) dann prüfe Guardrail (service)"
-
-ui/
-└── zeigt Ergebnis an, ruft application auf
+# Technologieauswahl
 
 | Technologie       | Paket                  | Zweck                                         |
 |-------------------|------------------------|-----------------------------------------------|
@@ -40,6 +20,39 @@ ui/
 | Projektdefinition | pyproject.toml         | Metadaten, Abhängigkeiten, Tool-Konfiguration |
 langchain-text-splitters-1.1.1
 
+
+# Projektstruktur Mentales Modell
+data/ - Arbeitsdaten/Dokumente
+scripts/ - Ausführbare Skripte
+
+studienberater/
+
+    application/    Schicht der Anwendungslogik
+        services/   kleinere, klar abgegrenzte Bausteine
+        use_cases/  zusammengesetzte Abläufe für konkrete Anwendungsfälle (bestehen aus services + infrastructure + domain)
+
+    bootstrap       Verdrahtung der konkreten Abhängigkeiten
+
+    config          Einstellungen
+
+    domain/         datenstrukturen
+    infrastructure/ implementierung der ports
+    presentation/
+
+
+# Datenmodelle
+Dokumentstruktur
+    Document
+    Page
+
+Retrieval/Kontexstruktur
+    Chunk
+    ScoredChunk
+    RetrievalResult
+
+Interaktionsstruktur
+    Query
+    Answer
 
 # Installationsanweisung:
 

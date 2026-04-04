@@ -1,0 +1,41 @@
+# Imports
+from ...domain.models import Answer, Query
+from ...domain.ports import LanguageModelPort
+from ..services import GroundingService, GuardrailService
+from .retrieval_use_case import RetrievalUseCase
+
+
+class AnswerUseCase:
+    
+    def __init__(
+            self,
+            retrieval_use_case: RetrievalUseCase,
+            grounding_service: GroundingService,
+            guardrail_service: GuardrailService,
+            llm: LanguageModelPort
+        ):
+        self.retrieval_use_case = retrieval_use_case
+        self.grounding_service = grounding_service
+        self.guardrail_service = guardrail_service
+        self.language_model = llm
+
+    def execute(self, question: str) -> Answer:
+        """Nimmt eine Nutzerfrage und gibt eine belegte Antwort zurück."""
+        query = Query(question=question)
+        result = self.retrieval_use_case.execute(query)
+
+        if not self.guardrail_service.has_sufficient_evidence(result):
+            return Answer(
+                text=self.guardrail_service.get_no_evidence_response(),
+                sources=[],
+                has_evidence=False,
+            )
+        
+        prompt = self.grounding_service.build_prompt(query, result)
+        answer_text = self.language_model.generate(prompt)
+
+        return Answer(
+            text=answer_text,
+            sources=[sc.chunk for sc in result.scored_chunks],
+            has_evidence=True,
+        )

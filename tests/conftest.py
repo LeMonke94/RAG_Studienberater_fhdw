@@ -1,12 +1,13 @@
 """
-Shared stubs und fixtures für alle unit tests.
-
-Stubs sind konkrete, minimale Implementierungen der Port-Interfaces.
-Sie ersetzen externe Abhängigkeiten (Ollama, Qdrant) vollständig.
+Stubs und fixtures für alle Unit-Tests
+Stubs sind konkrete, minimale Implementierungen der Port-Interfaces
+Ersetzen externe Abhängigkeiten (Ollama, Qdrant) vollständig
 """
 
+# Imports
 import pytest
 
+# Import Dataclasses from Models
 from rag_studienberater.domain.models import (
     Chunk,
     Document,
@@ -15,6 +16,7 @@ from rag_studienberater.domain.models import (
     RetrievalResult,
     ScoredChunk,
 )
+# Import Ports
 from rag_studienberater.domain.ports import (
     DocumentLoaderPort,
     EmbeddingPort,
@@ -36,9 +38,10 @@ class StubTextSplitter(TextSplitterPort):
 
 
 class StubEmbedder(EmbeddingPort):
-    """Liefert deterministische Dummy-Vektoren und protokolliert Aufrufe."""
+    """Liefert Dummy-Vektoren und protokolliert Aufrufe."""
 
-    DIM = 4
+    # Dimensionen
+    DIM = 3
 
     def __init__(self):
         self.embed_query_calls: list[str] = []
@@ -46,11 +49,11 @@ class StubEmbedder(EmbeddingPort):
 
     def embed_query(self, text: str) -> list[float]:
         self.embed_query_calls.append(text)
-        return [0.1] * self.DIM
-
+        return [0.6] * self.DIM
+    
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         self.embed_documents_calls.append(texts)
-        return [[0.1] * self.DIM for _ in texts]
+        return [[0.3] * self.DIM for _ in texts]
 
 
 class StubVectorStore(VectorStorePort):
@@ -79,7 +82,7 @@ class StubVectorStore(VectorStorePort):
 class StubLanguageModel(LanguageModelPort):
     """Gibt eine konfigurierbare Antwort zurück und protokolliert den letzten Prompt."""
 
-    def __init__(self, response: str = "Stub-Antwort"):
+    def __init__(self, response: str = 'Test-Antwort'):
         self.response = response
         self.last_prompt: str | None = None
         self.call_count: int = 0
@@ -95,9 +98,9 @@ class StubDocumentLoader(DocumentLoaderPort):
 
     def __init__(self, document: Document | None = None):
         self.document = document or Document(
-            name="test.pdf",
-            source="test.pdf",
-            pages=[Page(text="Standardinhalt", page_number=1)],
+            name='test.pdf',
+            source='test.pdf',
+            pages=[Page(text='Standardinhalt', page_number=1)],
         )
         self.load_calls: list[str] = []
 
@@ -107,7 +110,7 @@ class StubDocumentLoader(DocumentLoaderPort):
 
 
 class StubRetrievalUseCase:
-    """Duck-Typed Stub für RetrievalUseCase (kein Port, daher kein ABC)."""
+    """Stub für RetrievalUseCase (kein Port, daher kein ABC)."""
 
     def __init__(self, result: RetrievalResult | None = None):
         self.result = result or RetrievalResult(scored_chunks=[])
@@ -116,14 +119,13 @@ class StubRetrievalUseCase:
         return self.result
 
 
-
-# Fixtures — Domänenobjekte
+# Fixtures — Factory Objekte
 @pytest.fixture
 def make_chunk():
     """Factory-Fixture für Chunk-Objekte."""
     def factory(
-        text: str = "Beispieltext.",
-        source: str = "test.pdf",
+        text: str = 'Beispieltext.',
+        source: str = 'test.pdf',
         page: int | None = 1,
         index: int = 0,
     ) -> Chunk:
@@ -140,8 +142,8 @@ def make_chunk():
 def make_scored_chunk(make_chunk):
     """Factory-Fixture für ScoredChunk-Objekte."""
     def factory(
-        text: str = "Beispieltext.",
-        source: str = "test.pdf",
+        text: str = 'Beispieltext.',
+        source: str = 'test.pdf',
         page: int | None = 1,
         score: float = 0.8,
     ) -> ScoredChunk:
@@ -154,17 +156,16 @@ def make_document():
     """Factory-Fixture für Document-Objekte."""
     def factory(
         pages: list[Page] | None = None,
-        name: str = "test.pdf",
-        source: str = "test.pdf",
+        name: str = 'test.pdf',
+        source: str = 'test.pdf',
     ) -> Document:
         if pages is None:
-            pages = [Page(text="Standardinhalt", page_number=1)]
+            pages = [Page(text='Standardinhalt', page_number=1)]
         return Document(name=name, source=source, pages=pages)
     return factory
 
 
-
-# Fixtures — Stubs
+# Instanzierung der Fixtures
 @pytest.fixture
 def stub_text_splitter() -> StubTextSplitter:
     return StubTextSplitter()

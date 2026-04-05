@@ -18,10 +18,10 @@ class OllamaSettings(BaseModel):
 class ChunkingSettings(BaseModel):
     chunk_size: int = Field(default=512, gt=0)
     chunk_overlap: int = Field(default=50, ge=0)
-    top_k: int = Field(default=5, gt=0)
+    top_k: int = Field(default=10, gt=0)
 
 class GuardrailSettings(BaseModel):
-    min_score: float = Field(default=0.5, ge=0.0, le=1.0)
+    min_score: float = Field(default=0.65, ge=0.0, le=1.0)
 
 class LoggingSettings(BaseModel):
     level: str = 'INFO'

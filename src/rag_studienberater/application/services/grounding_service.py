@@ -7,7 +7,7 @@ from ...domain.models import Query, RetrievalResult
 class GroundingService:
 
     def build_prompt(self, query: Query, result: RetrievalResult) -> str:
-        """Baut einen Prompt aus Nutzerfrage und Retrieval-Ergebnis."""
+        """Baut einen Prompt aus Nutzerfrage und Retrieval-Ergebnis zusammen."""
 
         context = self._format_context(result)
 

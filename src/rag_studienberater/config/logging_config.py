@@ -2,6 +2,7 @@
 import logging
 import sys
 
+
 def setup_logging(level: str = 'INFO') -> None:
     logger = logging.getLogger()
 
@@ -18,8 +19,8 @@ def setup_logging(level: str = 'INFO') -> None:
 
     logger.addHandler(handler)
 
-    logging.getLogger("qdrant_client").setLevel(logging.WARNING)
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-    logging.getLogger("httpcore").setLevel(logging.WARNING)
-    logging.getLogger("urllib3").setLevel(logging.WARNING)
-    logging.getLogger("pdfminer").setLevel(logging.WARNING)
+    logging.getLogger('qdrant_client').setLevel(logging.WARNING)
+    logging.getLogger('httpx').setLevel(logging.WARNING)
+    logging.getLogger('httpcore').setLevel(logging.WARNING)
+    logging.getLogger('urllib3').setLevel(logging.WARNING)
+    logging.getLogger('pdfminer').setLevel(logging.WARNING)

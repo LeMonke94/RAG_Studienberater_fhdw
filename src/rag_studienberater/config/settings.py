@@ -3,6 +3,7 @@ from functools import lru_cache
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class QdrantSettings(BaseModel):
     endpoint: str
     api_key: str

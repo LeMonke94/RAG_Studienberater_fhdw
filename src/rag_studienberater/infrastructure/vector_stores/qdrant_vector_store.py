@@ -16,7 +16,6 @@ class QdrantVectorStore(VectorStorePort):
         self._ensure_collection_exists()
 
     def add_chunks(self, chunks: list[Chunk], vectors: list[list[float]]) -> None:
-        """Speichert Chunks mit den zugehörigen Vektoren in der Datenbank."""
         if len(chunks) != len(vectors):
             raise ValueError('Chunks und Vektoren müssen die gleiche Anzahl haben.')
         
@@ -41,7 +40,6 @@ class QdrantVectorStore(VectorStorePort):
         )
 
     def search(self, query_vector: list[float], top_k: int = 5) -> list[ScoredChunk]:
-        """Sucht die ähnlichsten Chunks zum gegebenen Vektor aus der Datenbank."""
         results = self.qdrant_client.query_points(
             collection_name=self.collection_name,
             query=query_vector,
@@ -83,6 +81,5 @@ class QdrantVectorStore(VectorStorePort):
         return self.collection_name in names
     
     def clear(self) -> None:
-        """Löscht alle gespeicherten Werte."""
         self.qdrant_client.delete_collection(collection_name=self.collection_name)
         self._ensure_collection_exists()

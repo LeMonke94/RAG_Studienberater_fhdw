@@ -4,8 +4,8 @@ import logging
 from ...domain.models import Query, RetrievalResult, ScoredChunk
 from ...domain.ports import EmbeddingPort, VectorStorePort
 
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 class RetrievalService:
 

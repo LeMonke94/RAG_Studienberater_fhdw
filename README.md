@@ -81,6 +81,7 @@ tests/
 - [Qdrant Cloud](https://cloud.qdrant.io) Account (oder lokale Qdrant-Instanz)
 
 ## Installation
+py -m pytest tests/ 
 
 **1. Repository klonen**
 ```bash
@@ -169,3 +170,21 @@ py scripts/evaluate.py --skip-ingest
 ```
 
 Ergebnisse werden automatisch in `data/evaluation/results_<datum>.json` gespeichert.
+
+
+
+"""st.markdown(###
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+html, body, [class*="css"], .stApp {
+    font-family: 'IBM Plex Sans', sans-serif !important;
+}
+.stApp {
+    background: linear-gradient(135deg, #0B1E3D 0%, #1A2E55 50%, #2A1810 100%) !important;
+    color: #F0F4FF;
+}
+.stTextInput > div > div > input {
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+</style>
+###, unsafe_allow_html=True)"""

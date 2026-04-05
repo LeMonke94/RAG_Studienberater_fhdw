@@ -28,23 +28,23 @@ class TestIngestUseCaseExecuteDocument:
 
     # Ensure chunks were saved correctly in the Vector-Store
     def test_stores_chunks_in_vector_store(self, stub_loader, stub_text_splitter, stub_embedder, stub_vector_store):
-        stub_text_splitter._chunks = ['chunk_a', 'chunk_b']
+        stub_text_splitter._chunks = ['Erster Chunk mit ausreichend Text.', 'Zweiter Chunk mit ausreichend Text.']
         uc = make_ingest_use_case(stub_loader, stub_text_splitter, stub_embedder, stub_vector_store)
         uc.execute_document('test.pdf')
         assert len(stub_vector_store.stored_chunks) == 2
 
     # Ensure chunk text was saved correctly as in the splitter
     def test_stored_chunks_match_texts(self, stub_loader, stub_text_splitter, stub_embedder, stub_vector_store):
-        stub_text_splitter._chunks = ['Erster Chunk', 'Zweiter Chunk']
+        stub_text_splitter._chunks = ['Erster Chunk mit ausreichend Text.', 'Zweiter Chunk mit ausreichend Text.']
         uc = make_ingest_use_case(stub_loader, stub_text_splitter, stub_embedder, stub_vector_store)
         uc.execute_document('test.pdf')
         texts = [c.text for c in stub_vector_store.stored_chunks]
-        assert 'Erster Chunk' in texts
-        assert 'Zweiter Chunk' in texts
+        assert 'Erster Chunk mit ausreichend Text.' in texts
+        assert 'Zweiter Chunk mit ausreichend Text.' in texts
 
     # Ensures there's one vector for one chunk
     def test_chunk_count_matches_vector_count(self, stub_loader, stub_text_splitter, stub_embedder, stub_vector_store):
-        stub_text_splitter._chunks = ['a', 'b', 'c']
+        stub_text_splitter._chunks = ['Chunk A mit ausreichend Text.', 'Chunk B mit ausreichend Text.', 'Chunk C mit ausreichend Text.']
         uc = make_ingest_use_case(stub_loader, stub_text_splitter, stub_embedder, stub_vector_store)
         uc.execute_document('test.pdf')
         assert len(stub_vector_store.stored_chunks) == len(stub_vector_store.stored_vectors)
@@ -65,34 +65,38 @@ class TestIngestUseCaseExecuteDocument:
         uc.execute_document('test.pdf')
         assert stub_vector_store.add_chunks_call_count == 0
 
-    # Ensures only prepared chunks are sent to the embedder
-    def test_embedder_called_with_chunk_texts(self, stub_loader, stub_text_splitter, stub_embedder, stub_vector_store):
-        stub_text_splitter._chunks = ['alpha', 'beta']
+    # Ensures each chunk is embedded individually
+    def test_embedder_called_once_per_chunk(self, stub_loader, stub_text_splitter, stub_embedder, stub_vector_store):
+        stub_text_splitter._chunks = ['Alpha-Text mit ausreichend Inhalt.', 'Beta-Text mit ausreichend Inhalt.']
         uc = make_ingest_use_case(stub_loader, stub_text_splitter, stub_embedder, stub_vector_store)
         uc.execute_document('test.pdf')
-        assert stub_embedder.embed_documents_calls[-1] == ['alpha', 'beta']
+        # Per-Chunk-Embedding: embed_documents wird einmal pro Chunk aufgerufen
+        assert len(stub_embedder.embed_documents_calls) == 2
+        assert stub_embedder.embed_documents_calls[0] == ['Alpha-Text mit ausreichend Inhalt.']
+        assert stub_embedder.embed_documents_calls[1] == ['Beta-Text mit ausreichend Inhalt.']
 
-    # Test for error raise if chunks amount doesnt fit vector amount
-    def test_mismatched_chunks_and_vectors_raises(self, stub_loader, stub_text_splitter, stub_vector_store, make_document):
-        """Embedder der immer nur 1 Vektor zurückgibt, egal wie viele Chunks."""
+    # Chunks with NaN vectors are silently skipped, not raising ValueError
+    def test_nan_vector_chunks_are_skipped(self, stub_loader, stub_text_splitter, stub_vector_store, make_document):
+        """Embedder der NaN zurückgibt — Chunk wird übersprungen, kein Absturz."""
 
-        class OnlyOneVectorEmbedder(EmbeddingPort):
+        class NanEmbedder(EmbeddingPort):
             def embed_query(self, text: str) -> list[float]:
-                return [0.1]
+                return [float('nan')]
 
             def embed_documents(self, texts: list[str]) -> list[list[float]]:
-                return [[0.1]]  # always one
+                return [[float('nan'), float('nan'), float('nan')]]
 
-        stub_text_splitter._chunks = ['a', 'b']  # two chunks
+        stub_text_splitter._chunks = ['Chunk A mit ausreichend Text.', 'Chunk B mit ausreichend Text.']
         uc = IngestUseCase(
             loader=stub_loader,
             text_cleaner_service=TextCleanerService(),
             chunking_service=ChunkingService(text_splitter=stub_text_splitter),
-            embedder=OnlyOneVectorEmbedder(),
+            embedder=NanEmbedder(),
             vector_store=stub_vector_store,
         )
-        with pytest.raises(ValueError):
-            uc.execute_document('test.pdf')
+        uc.execute_document('test.pdf')
+        # Keine Exception, aber auch nichts gespeichert
+        assert stub_vector_store.stored_chunks == []
 
 
 class TestIngestUseCaseExecuteFolder:
@@ -103,7 +107,21 @@ class TestIngestUseCaseExecuteFolder:
         (tmp_path / 'b.pdf').write_text('PDF Inhalt B')
         (tmp_path / 'ignored.txt').write_text('Kein PDF')
 
-        stub_text_splitter._chunks = ['chunk']
+        stub_text_splitter._chunks = ['Chunk mit ausreichend Text fuer den Filter.']
+        uc = make_ingest_use_case(stub_loader, stub_text_splitter, stub_embedder, stub_vector_store)
+        uc.execute_folder(str(tmp_path))
+
+        pdf_calls = [c for c in stub_loader.load_calls if c.endswith('.pdf')]
+        assert len(pdf_calls) == 2
+
+    # Ensures PDFs in subdirectories are also found
+    def test_processes_pdfs_in_subdirectories(self, stub_loader, stub_text_splitter, stub_embedder, stub_vector_store, tmp_path):
+        (tmp_path / 'root.pdf').write_text('Root PDF')
+        sub = tmp_path / 'Unterordner'
+        sub.mkdir()
+        (sub / 'sub.pdf').write_text('Sub PDF')
+
+        stub_text_splitter._chunks = ['Chunk mit ausreichend Text fuer den Filter.']
         uc = make_ingest_use_case(stub_loader, stub_text_splitter, stub_embedder, stub_vector_store)
         uc.execute_folder(str(tmp_path))
 
@@ -114,7 +132,7 @@ class TestIngestUseCaseExecuteFolder:
     def test_skips_non_pdf_files(self, stub_loader, stub_text_splitter, stub_embedder, stub_vector_store, tmp_path):
         (tmp_path / 'readme.txt').write_text('Kein PDF')
 
-        stub_text_splitter._chunks = ['chunk']
+        stub_text_splitter._chunks = ['Chunk mit ausreichend Text fuer den Filter.']
         uc = make_ingest_use_case(stub_loader, stub_text_splitter, stub_embedder, stub_vector_store)
         uc.execute_folder(str(tmp_path))
 
@@ -125,8 +143,35 @@ class TestIngestUseCaseExecuteUrls:
 
     # Ensures every source was passed correctly to the loader
     def test_calls_execute_document_per_url(self, stub_loader, stub_text_splitter, stub_embedder, stub_vector_store):
-        stub_text_splitter._chunks = ['chunk']
+        stub_text_splitter._chunks = ['Chunk mit ausreichend Text fuer den Filter.']
         uc = make_ingest_use_case(stub_loader, stub_text_splitter, stub_embedder, stub_vector_store)
         urls = ['https://fhdw.de/page1', 'https://fhdw.de/page2']
         uc.execute_urls(urls)
         assert stub_loader.load_calls == urls
+
+
+class TestIngestUseCaseExecuteUrlsFromFile:
+
+    # Ensures URLs are read from JSON and passed to loader
+    def test_reads_urls_from_json(self, stub_loader, stub_text_splitter, stub_embedder, stub_vector_store, tmp_path):
+        import json
+        url_file = tmp_path / 'urls.json'
+        url_file.write_text(json.dumps({'urls': ['https://fhdw.de/a', 'https://fhdw.de/b']}))
+
+        stub_text_splitter._chunks = ['Chunk mit ausreichend Text fuer den Filter.']
+        uc = make_ingest_use_case(stub_loader, stub_text_splitter, stub_embedder, stub_vector_store)
+        uc.execute_urls_from_file(str(url_file))
+
+        assert stub_loader.load_calls == ['https://fhdw.de/a', 'https://fhdw.de/b']
+
+    # Ensures empty URL list does nothing
+    def test_empty_urls_does_nothing(self, stub_loader, stub_text_splitter, stub_embedder, stub_vector_store, tmp_path):
+        import json
+        url_file = tmp_path / 'urls.json'
+        url_file.write_text(json.dumps({'urls': []}))
+
+        stub_text_splitter._chunks = ['Chunk mit ausreichend Text fuer den Filter.']
+        uc = make_ingest_use_case(stub_loader, stub_text_splitter, stub_embedder, stub_vector_store)
+        uc.execute_urls_from_file(str(url_file))
+
+        assert stub_loader.load_calls == []

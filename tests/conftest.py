@@ -31,7 +31,10 @@ class StubTextSplitter(TextSplitterPort):
     """Gibt eine konfigurierbare Liste von Strings zurück."""
 
     def __init__(self, chunks: list[str] | None = None):
-        self._chunks = chunks if chunks is not None else ["chunk_a", "chunk_b"]
+        self._chunks = chunks if chunks is not None else [
+            "Dies ist Chunk A mit ausreichend Inhalt.",
+            "Dies ist Chunk B mit ausreichend Inhalt.",
+        ]
 
     def split_text(self, text: str) -> list[str]:
         return self._chunks

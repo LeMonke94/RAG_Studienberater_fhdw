@@ -1,6 +1,9 @@
+# Imports
 from rag_studienberater.bootstrap.container import create_container
 
+
 def main() -> None:
+    """"""
     container = create_container()
     container.ingest_use_case.execute_folder('data/raw/pdf')
 

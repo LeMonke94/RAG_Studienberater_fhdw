@@ -1,3 +1,4 @@
+# Imports
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from ...domain.ports import TextSplitterPort
@@ -13,5 +14,4 @@ class LangChainTextSplitter(TextSplitterPort):
         )
 
     def split_text(self, text: str) -> list[str]:
-        """Teilt einen Text mit LangChain in Teiltexte auf."""
         return self.splitter.split_text(text)

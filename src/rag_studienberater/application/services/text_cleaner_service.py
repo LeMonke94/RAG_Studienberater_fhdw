@@ -1,7 +1,7 @@
 # Imports
 import re
 
-# Hilfsklasse
+
 class TextCleanerService:
     """Bereinigt einen Text (Whitespace, Zeilenumbrüche etc.)."""
 

@@ -20,7 +20,7 @@ class AnswerUseCase:
         self.language_model = llm
 
     def execute(self, question: str) -> Answer:
-        """Nimmt eine Nutzerfrage und gibt eine belegte Antwort zurück."""
+        """Nimmt eine Nutzerfrage an und gibt eine belegte Antwort zurück."""
         query = Query(question=question)
         result = self.retrieval_use_case.execute(query)
 

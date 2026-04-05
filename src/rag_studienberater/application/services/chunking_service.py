@@ -8,10 +8,9 @@ class ChunkingService:
     def __init__(self, text_splitter: TextSplitterPort):
         self.text_splitter = text_splitter
 
-    # Split Document into Chunks
     def chunk_document(self, document: Document) -> list[Chunk]:
-        """Trennt ein Dokument in Chunks auf."""
-
+        """Teilt ein Dokument in Chunks auf."""
+        
         chunks: list[Chunk] = []
 
         for page in document.pages:

@@ -12,7 +12,6 @@ class OllamaLanguageModel(LanguageModelPort):
         )
 
     def generate(self, prompt: str) -> str:
-        """Generiert eine Antwort des Sprachmodells für den gegebenen Prompt."""
         response = self.llm.invoke(prompt)
         
         if not response.content:

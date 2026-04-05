@@ -78,7 +78,8 @@ def create_container() -> Container:
 
     # Use Cases
     retrieval_use_case = RetrievalUseCase(
-        retrieval_service=retrieval_service
+        retrieval_service=retrieval_service,
+        top_k=settings.chunking.top_k,
     )
     ingest_use_case = IngestUseCase(
         loader=document_loader,

@@ -118,7 +118,7 @@ class StubRetrievalUseCase:
     def __init__(self, result: RetrievalResult | None = None):
         self.result = result or RetrievalResult(scored_chunks=[])
 
-    def execute(self, query: Query, top_k: int = 5) -> RetrievalResult:
+    def execute(self, query: Query) -> RetrievalResult:
         return self.result
 
 

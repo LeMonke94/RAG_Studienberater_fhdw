@@ -1,8 +1,6 @@
 """
-Evaluations-Skript für den RAG-Studienberater.
-
-Lädt das Testset, schickt jede Frage durch die vollständige Pipeline
-und bewertet die Antwortqualität anhand messbarer Kriterien.
+Evaluations-Skript
+    Lädt das Testset + schickt jede Frage durch die vollständige Pipeline + bewertet die Antwortqualität anhand messbarer Kriterien.
 
 Verwendung:
     py scripts/evaluate.py
@@ -10,6 +8,7 @@ Verwendung:
     py scripts/evaluate.py --skip-ingest   # wenn Dokumente bereits geladen sind
 """
 
+# Imports
 import argparse
 import json
 import sys
@@ -19,240 +18,228 @@ from datetime import datetime
 from pathlib import Path
 
 
-# ---------------------------------------------------------------------------
-# Datenmodell für Ergebnisse
-# ---------------------------------------------------------------------------
-
+# Data Models for Results
 @dataclass
-class FrageErgebnis:
+class QuestionResult:
     id: str
-    kategorie: str
-    frage: str
-    erwartet_antwort: bool
+    category: str
+    question: str
+    expected_answer: bool
 
     # System-Output
-    hat_antwort: bool = False
-    antwort_text: str = ""
-    quellen: list[str] = field(default_factory=list)
-    laufzeit_sek: float = 0.0
+    has_answer: bool = False
+    answer_text: str = ""
+    sources: list[str] = field(default_factory=list)
+    runtime_sec: float = 0.0
 
-    # Automatische Metriken
-    guardrail_korrekt: bool = False      # System verhält sich wie erwartet (Antwort / Kein-Antwort)
-    hat_quellen: bool = False            # Antwort enthält Quellenangaben
-    keyword_recall: float = 0.0         # Anteil gefundener Schlüsselwörter (0.0–1.0)
+    # Automated Metrics
+    guardrail_correct: bool = False      # System behaves as expected (Answer / No Answer)
+    has_sources: bool = False            # Answer contains source citations
+    keyword_recall: float = 0.0          # Ratio of found keywords (0.0-1.0)
 
-    # Manuell bewertbar (nach Durchlauf ausfüllen)
-    korrektheit: int = -1               # 0=falsch, 1=teilweise, 2=korrekt  (-1 = nicht bewertet)
-    vollständigkeit: int = -1           # 0=unvollständig, 1=teilweise, 2=vollständig
-    anmerkung: str = ""
-
+    # Manually evaluable (to be filled out after the run)
+    correctness: int = -1                # 0=false, 1=partial, 2=correct (-1 = not evaluated)
+    completeness: int = -1               # 0=incomplete, 1=partial, 2=complete
+    notes: str = ""
 
 @dataclass
-class EvaluationsBericht:
-    zeitstempel: str
-    testset_pfad: str
-    gesamt: int = 0
-    guardrail_korrektheit: float = 0.0
-    quellenangabe_quote: float = 0.0
-    durchschnittlicher_keyword_recall: float = 0.0
-    durchschnittliche_laufzeit_sek: float = 0.0
-    ergebnisse: list[FrageErgebnis] = field(default_factory=list)
+class EvaluationReport:
+    timestamp: str
+    testset_path: str
+    total_questions: int = 0
+    guardrail_accuracy: float = 0.0
+    source_citation_rate: float = 0.0
+    average_keyword_recall: float = 0.0
+    average_runtime_sec: float = 0.0
+    results: list[QuestionResult] = field(default_factory=list)
 
 
-# ---------------------------------------------------------------------------
 # Scoring
-# ---------------------------------------------------------------------------
-
-def berechne_keyword_recall(antwort_text: str, schlüsselwörter: list[str]) -> float:
+def calculate_keyword_recall(answer_text: str, keywords: list[str]) -> float:
     """Anteil der Schlüsselwörter, die in der Antwort vorkommen (case-insensitive)."""
-    if not schlüsselwörter:
-        return 1.0  # Keine Erwartung = volle Punktzahl
+    if not keywords:
+        return 1.0  # No expectations = full score
 
-    antwort_lower = antwort_text.lower()
-    treffer = sum(1 for kw in schlüsselwörter if kw.lower() in antwort_lower)
-    return treffer / len(schlüsselwörter)
+    answer_lower = answer_text.lower()
+    matches = sum(1 for kw in keywords if kw.lower() in answer_lower)
+    return matches / len(keywords)
 
-
-def score_ergebnis(ergebnis: FrageErgebnis, frage_data: dict) -> None:
+def score_result(result: QuestionResult, question_data: dict) -> None:
     """Berechnet alle automatischen Metriken und schreibt sie ins Ergebnis."""
-    ergebnis.guardrail_korrekt = ergebnis.hat_antwort == ergebnis.erwartet_antwort
-    ergebnis.hat_quellen = ergebnis.hat_antwort and len(ergebnis.quellen) > 0
-    ergebnis.keyword_recall = berechne_keyword_recall(
-        ergebnis.antwort_text,
-        frage_data.get("schlüsselwörter", [])
+    # Guardrail is correct if the system's decision to answer matches our expectation
+    result.guardrail_correct = result.has_answer == result.expected_answer
+    
+    # Check if we got an answer and if it includes at least one source
+    result.has_sources = result.has_answer and len(result.sources) > 0
+    
+    # Calculate how many of the expected keywords were mentioned
+    result.keyword_recall = calculate_keyword_recall(
+        result.answer_text,
+        question_data.get("keywords", [])
     )
 
 
-# ---------------------------------------------------------------------------
-# Report-Ausgabe
-# ---------------------------------------------------------------------------
+# Report-Output
+SEPARATOR = '-' * 80
 
-TRENNLINIE = "─" * 80
+def get_symbol(value: bool) -> str:
+    return '✓' if value else '✗'
 
-def symbol(wert: bool) -> str:
-    return "✓" if wert else "✗"
+def render_recall_bar(recall: float, width: int = 10) -> str:
+    """Lädt eine Progress-Bar für den Keyword recall"""
+    filled = round(recall * width)
+    return f"[{'█' * filled}{'░' * (width - filled)}] {recall:.0%}"
 
+def print_results(results: list[QuestionResult]) -> None:
+    """Druckt eine Detailierte Ausgabe für jede Antwort auf eine Frage in der Konsole."""
+    print(f'\n{SEPARATOR}')
+    print('  EINZELERGEBNISSE')
+    print(SEPARATOR)
 
-def recall_balken(recall: float, breite: int = 10) -> str:
-    gefüllt = round(recall * breite)
-    return f"[{'█' * gefüllt}{'░' * (breite - gefüllt)}] {recall:.0%}"
+    for r in results:
+        guardrail_sym = get_symbol(r.guardrail_correct)
+        source_sym    = get_symbol(r.has_sources) if r.has_answer else ' -'
+        recall_str    = render_recall_bar(r.keyword_recall) if r.expected_answer else '   (off-topic)'
 
+        print(f'\n  [{r.id}] {r.question[:65]}')
+        print(f'       Kategorie  : {r.category}')
+        print(f"       Guardrail : {guardrail_sym}  (erwartet={'Antwort' if r.expected_answer else 'Keine Antwort'}, "
+              f"erhalten={'Antwort' if r.has_answer else 'Keine Antwort'})")
 
-def drucke_ergebnisse(ergebnisse: list[FrageErgebnis]) -> None:
-    print(f"\n{TRENNLINIE}")
-    print("  EINZELERGEBNISSE")
-    print(TRENNLINIE)
-
-    for e in ergebnisse:
-        guardrail_sym = symbol(e.guardrail_korrekt)
-        quellen_sym   = symbol(e.hat_quellen) if e.hat_antwort else " –"
-        recall_str    = recall_balken(e.keyword_recall) if e.erwartet_antwort else "   (off-topic)"
-
-        print(f"\n  [{e.id}] {e.frage[:65]}")
-        print(f"       Kategorie : {e.kategorie}")
-        print(f"       Guardrail : {guardrail_sym}  (erwartet={'Antwort' if e.erwartet_antwort else 'Keine Antwort'}, "
-              f"erhalten={'Antwort' if e.hat_antwort else 'Keine Antwort'})")
-
-        if e.hat_antwort:
-            print(f"       Quellen   : {quellen_sym}  ({len(e.quellen)} Quelle(n): {', '.join(e.quellen[:2])}{'...' if len(e.quellen) > 2 else ''})")
-            print(f"       Keywords  : {recall_str}")
-            print(f"       Antwort   : {e.antwort_text[:120]}{'...' if len(e.antwort_text) > 120 else ''}")
+        if r.has_answer:
+            print(f"       Quellen   : {source_sym}  ({len(r.sources)} Quelle(s): {', '.join(r.sources[:2])}{'...' if len(r.sources) > 2 else ''})")
+            print(f'       Keywords  : {recall_str}')
+            print(f"       Antwort    : {r.answer_text[:120]}{'...' if len(r.answer_text) > 120 else ''}")
         else:
-            print(f"       Antwort   : [Guardrail ausgelöst]")
+            print(f'       Antwort    : [Guardrail ausgelöst]')
 
-        print(f"       Zeit      : {e.laufzeit_sek:.2f}s")
+        print(f'       Zeit      : {r.runtime_sec:.2f}s')
 
+def print_summary(report: EvaluationReport) -> None:
+    """Zeigt eine aggregierte Zusammenfassung aller Metriken."""
+    print(f'\n{SEPARATOR}')
+    print('  ZUSAMMENFASSUNG')
+    print(SEPARATOR)
 
-def drucke_zusammenfassung(bericht: EvaluationsBericht) -> None:
-    print(f"\n{TRENNLINIE}")
-    print("  ZUSAMMENFASSUNG")
-    print(TRENNLINIE)
+    print(f'\n  Gesamt-Fragen         : {report.total_questions}')
+    print(f'  Guardrail-Korrektheit : {report.guardrail_accuracy:.0%}  '
+          f'({round(report.guardrail_accuracy * report.total_questions)}/{report.total_questions} korrekt)')
+    print(f'  Quellenangabe-Quote   : {report.source_citation_rate:.0%}  '
+          f'(bei beantworteten Fragen)')
+    print(f'  Ø Keyword-Recall      : {report.average_keyword_recall:.0%}')
+    print(f'  Ø Laufzeit            : {report.average_runtime_sec:.2f}s pro Frage')
 
-    print(f"\n  Gesamt-Fragen         : {bericht.gesamt}")
-    print(f"  Guardrail-Korrektheit : {bericht.guardrail_korrektheit:.0%}  "
-          f"({round(bericht.guardrail_korrektheit * bericht.gesamt)}/{bericht.gesamt} korrekt)")
-    print(f"  Quellenangabe-Quote   : {bericht.quellenangabe_quote:.0%}  "
-          f"(bei beantworteten Fragen)")
-    print(f"  Ø Keyword-Recall      : {bericht.durchschnittlicher_keyword_recall:.0%}")
-    print(f"  Ø Laufzeit            : {bericht.durchschnittliche_laufzeit_sek:.2f}s pro Frage")
-
-    # Aufschlüsselung nach Kategorie
-    kategorien: dict[str, list[FrageErgebnis]] = {}
-    for e in bericht.ergebnisse:
-        kategorien.setdefault(e.kategorie, []).append(e)
+    # Breakdown by category
+    categories: dict[str, list[QuestionResult]] = {}
+    for r in report.results:
+        categories.setdefault(r.category, []).append(r)
 
     print(f"\n  {'Kategorie':<22} {'Fragen':>6}  {'Guardrail':>10}  {'Quellen':>8}  {'Keywords':>10}")
     print(f"  {'─'*22} {'─'*6}  {'─'*10}  {'─'*8}  {'─'*10}")
 
-    for kat, einträge in sorted(kategorien.items()):
-        n = len(einträge)
-        gc = sum(1 for e in einträge if e.guardrail_korrekt) / n
-        qc = sum(1 for e in einträge if e.hat_quellen) / max(1, sum(1 for e in einträge if e.hat_antwort))
-        kr = sum(e.keyword_recall for e in einträge) / n
-        print(f"  {kat:<22} {n:>6}  {gc:>9.0%}  {qc:>7.0%}  {kr:>9.0%}")
+    for cat, entries in sorted(categories.items()):
+        n = len(entries)
+        gc = sum(1 for e in entries if e.guardrail_correct) / n
+        qc = sum(1 for e in entries if e.has_sources) / max(1, sum(1 for e in entries if e.has_answer))
+        kr = sum(e.keyword_recall for e in entries) / n
+        print(f"  {cat:<22} {n:>6}  {gc:>9.0%}  {qc:>7.0%}  {kr:>9.0%}")
 
     print()
 
-    # Hinweis auf manuelle Bewertung
+    # Note for manual evaluation
     print("  HINWEIS: Korrektheit und Vollständigkeit müssen manuell bewertet werden.")
     print("  Fülle die Felder 'korrektheit' und 'vollständigkeit' in der Ergebnisdatei aus:")
     print("    0 = falsch/unvollständig  |  1 = teilweise  |  2 = korrekt/vollständig")
     print()
 
 
-# ---------------------------------------------------------------------------
-# Hauptlogik
-# ---------------------------------------------------------------------------
-
-def lade_testset(pfad: str) -> list[dict]:
-    with open(pfad, encoding="utf-8") as f:
+# Main Logic
+def load_testset(path: str) -> list[dict]:
+    with open(path, encoding='utf-8') as f:
         data = json.load(f)
-    fragen = data.get("fragen", data) if isinstance(data, dict) else data
-    print(f"  Testset geladen: {len(fragen)} Fragen aus '{pfad}'")
-    return fragen
+    questions = data.get('fragen', data) if isinstance(data, dict) else data
+    print(f'  Testset geladen: {len(questions)} Fragen aus \'{path}\'')
+    return questions
 
-
-def speichere_bericht(bericht: EvaluationsBericht, ausgabe_dir: str) -> str:
-    Path(ausgabe_dir).mkdir(parents=True, exist_ok=True)
-    zeitstempel = bericht.zeitstempel.replace(":", "-").replace(" ", "_")
-    dateiname = f"results_{zeitstempel}.json"
-    pfad = str(Path(ausgabe_dir) / dateiname)
+def save_report(report: EvaluationReport, output_dir: str) -> str:
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    timestamp = report.timestamp.replace(':', '-').replace(' ', '_')
+    filename = f'results_{timestamp}.json'
+    path = str(Path(output_dir) / filename)
 
     # dataclass → dict (rekursiv)
-    def zu_dict(obj):
+    def to_dict(obj):
         if isinstance(obj, list):
-            return [zu_dict(i) for i in obj]
-        if hasattr(obj, "__dataclass_fields__"):
-            return {k: zu_dict(v) for k, v in asdict(obj).items()}
+            return [to_dict(i) for i in obj]
+        if hasattr(obj, '__dataclass_fields__'):
+            return {k: to_dict(v) for k, v in asdict(obj).items()}
         return obj
+    
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(to_dict(report), f, ensure_ascii=False, indent=2)
 
-    with open(pfad, "w", encoding="utf-8") as f:
-        json.dump(zu_dict(bericht), f, ensure_ascii=False, indent=2)
+    return path
 
-    return pfad
-
-
-def berechne_bericht_metriken(bericht: EvaluationsBericht) -> None:
+def calculate_report_metrics(report: EvaluationReport) -> None:
     """Aggregierte Metriken in den Bericht schreiben."""
-    n = len(bericht.ergebnisse)
+    n = len(report.results)
     if n == 0:
         return
-
-    bericht.gesamt = n
-    bericht.guardrail_korrektheit = sum(
-        1 for e in bericht.ergebnisse if e.guardrail_korrekt
+    
+    report.total_questions = n
+    report.guardrail_accuracy = sum(
+        1 for e in report.results if e.guardrail_correct
     ) / n
 
-    beantwortete = [e for e in bericht.ergebnisse if e.hat_antwort]
-    bericht.quellenangabe_quote = (
-        sum(1 for e in beantwortete if e.hat_quellen) / len(beantwortete)
-        if beantwortete else 0.0
+    answered = [e for e in report.results if e.has_answer]
+    report.source_citation_rate = (
+        sum(1 for e in answered if e.has_sources) / len(answered)
+        if answered else 0.0
     )
 
-    bericht.durchschnittlicher_keyword_recall = (
-        sum(e.keyword_recall for e in bericht.ergebnisse) / n
+    report.average_keyword_recall = (
+        sum(e.keyword_recall for e in report.results) / n
     )
-    bericht.durchschnittliche_laufzeit_sek = (
-        sum(e.laufzeit_sek for e in bericht.ergebnisse) / n
+    report.average_runtime_sec = (
+        sum(e.runtime_sec for e in report.results) / n
     )
-
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="RAG-Studienberater Evaluation")
+    parser = argparse.ArgumentParser(description='RAG-Studienberater Evaluation')
     parser.add_argument(
-        "--testset",
-        default="data/evaluation/testset.json",
-        help="Pfad zur Testset-JSON-Datei",
+        '--testset',
+        default='data/evaluation/testset.json',
+        help='Pfad zur Testset-JSON-Datei',
     )
     parser.add_argument(
-        "--output",
-        default="data/evaluation",
-        help="Ausgabeverzeichnis für den Ergebnisbericht",
+        '--output',
+        default='data/evaluation',
+        help='Ausgabeverzeichnis für den Ergebnisbericht',
     )
     parser.add_argument(
-        "--skip-ingest",
-        action="store_true",
-        help="Dokumente nicht erneut einlesen (Vector Store bereits befüllt)",
+        '--skip-ingest',
+        action='store_true',
+        help='Dokumente nicht erneut einlesen (Vector Store bereits befüllt)',
     )
     parser.add_argument(
-        "--ingest-folder",
-        default="data/raw/pdf",
-        help="Ordner mit PDFs für den Ingest (Standard: data/raw/pdf)",
+        '--ingest-folder',
+        default='data/raw/pdf',
+        help='Ordner mit PDFs für den Ingest (Standard: data/raw/pdf)',
     )
     args = parser.parse_args()
 
     print(f"\n{'═' * 80}")
-    print("  RAG-STUDIENBERATER — EVALUATION")
+    print('  RAG-STUDIENBERATER — EVALUATION')
     print(f"{'═' * 80}")
 
-    # Container initialisieren
-    print("\n  Initialisiere Pipeline...")
+    # Initialize Container
+    print('\n  Initialisiere Pipeline...')
     try:
         from rag_studienberater.bootstrap.container import create_container
         container = create_container()
     except Exception as exc:
-        print(f"\n  FEHLER beim Initialisieren: {exc}")
-        print("  Stelle sicher, dass Ollama läuft und .env korrekt konfiguriert ist.")
+        print(f'\n  FEHLER beim Initialisieren: {exc}')
+        print('  Stelle sicher, dass Ollama läuft und .env korrekt konfiguriert ist.')
         sys.exit(1)
 
     # Ingest
@@ -260,73 +247,75 @@ def main() -> None:
         print(f"  Lese Dokumente aus '{args.ingest_folder}' ein...")
         try:
             container.ingest_use_case.execute_folder(args.ingest_folder)
-            print("  Ingest abgeschlossen.")
+            print('  Ingest abgeschlossen.')
         except Exception as exc:
-            print(f"\n  WARNUNG: Ingest fehlgeschlagen: {exc}")
-            print("  Fahre fort mit bestehendem Vector-Store-Inhalt.")
+            print(f'\n  WARNUNG: Ingest fehlgeschlagen: {exc}')
+            print('  Fahre fort mit bestehendem Vector-Store-Inhalt.')
     else:
-        print("  Ingest übersprungen (--skip-ingest).")
+        print('  Ingest übersprungen (--skip-ingest).')
 
-    # Testset laden
+    # Load Testset
     print()
-    fragen = lade_testset(args.testset)
+    questions = load_testset(args.testset)
 
-    # Evaluation durchführen
-    bericht = EvaluationsBericht(
-        zeitstempel=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        testset_pfad=args.testset,
+    # Run Evaluation
+    report = EvaluationReport(
+        timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        testset_path=args.testset,
     )
 
-    print(f"\n  Starte Evaluation ({len(fragen)} Fragen)...\n")
+    print(f'\n  Starte Evaluation ({len(questions)} Fragen)...\n')
 
-    for i, frage_data in enumerate(fragen, start=1):
-        frage_id = frage_data.get("id", f"Q{i:02d}")
-        frage_text = frage_data["frage"]
-        kategorie = frage_data.get("kategorie", "unbekannt")
-        erwartet_antwort = frage_data.get("erwartet_antwort", True)
+    for i, question_data in enumerate(questions, start=1):
+        q_id = question_data.get('id', f'Q{i:02d}')
 
-        print(f"  [{i:02d}/{len(fragen)}] {frage_text[:70]}", end="", flush=True)
+        q_text = question_data['frage']
+        category = question_data.get('kategorie', 'unbekannt')
+        expected_answer = question_data.get('erwartet_antwort', True)
 
-        ergebnis = FrageErgebnis(
-            id=frage_id,
-            kategorie=kategorie,
-            frage=frage_text,
-            erwartet_antwort=erwartet_antwort,
+        print(f'  [{i:02d}/{len(questions)}] {q_text[:70]}', end='', flush=True)
+
+        result = QuestionResult(
+            id=q_id,
+            category=category,
+            question=q_text,
+            expected_answer=expected_answer,
         )
 
         try:
             start = time.perf_counter()
-            answer = container.answer_use_case.execute(frage_text)
-            ergebnis.laufzeit_sek = time.perf_counter() - start
+            answer = container.answer_use_case.execute(q_text)
+            result.runtime_sec = time.perf_counter() - start
 
-            ergebnis.hat_antwort = answer.has_evidence
-            ergebnis.antwort_text = answer.text
-            ergebnis.quellen = list({
-                f"{chunk.source} S.{chunk.page}" if chunk.page else chunk.source
+            result.has_answer = answer.has_evidence
+            result.answer_text = answer.text
+            
+            # Using 'p.' instead of 'S.' for pages
+            result.sources = list({
+                f'{chunk.source} S.{chunk.page}' if chunk.page else chunk.source
                 for chunk in answer.sources
             })
 
         except Exception as exc:
-            ergebnis.laufzeit_sek = 0.0
-            ergebnis.antwort_text = f"[FEHLER: {exc}]"
+            result.runtime_sec = 0.0
+            result.answer_text = f'[FEHLER: {exc}]'
 
-        score_ergebnis(ergebnis, frage_data)
+        score_result(result, question_data)
 
-        status = symbol(ergebnis.guardrail_korrekt)
-        print(f"  {status}  ({ergebnis.laufzeit_sek:.1f}s)")
+        status = get_symbol(result.guardrail_correct)
+        print(f'  {status}  ({result.runtime_sec:.1f}s)')
 
-        bericht.ergebnisse.append(ergebnis)
+        report.results.append(result)
 
-    # Metriken berechnen und ausgeben
-    berechne_bericht_metriken(bericht)
-    drucke_ergebnisse(bericht.ergebnisse)
-    drucke_zusammenfassung(bericht)
+    # Calculate metrics and print
+    calculate_report_metrics(report)
+    print_results(report.results)
+    print_summary(report)
 
-    # Bericht speichern
-    ergebnis_pfad = speichere_bericht(bericht, args.output)
-    print(f"  Ergebnisse gespeichert: {ergebnis_pfad}")
+    # Save report
+    report_path = save_report(report, args.output)
+    print(f'  Ergebnisse gespeichert: {report_path}')
     print(f"{'═' * 80}\n")
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

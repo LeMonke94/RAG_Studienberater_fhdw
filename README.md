@@ -171,8 +171,120 @@ py scripts/evaluate.py --skip-ingest
 
 Ergebnisse werden automatisch in `data/evaluation/results_<datum>.json` gespeichert.
 
+---
 
 
+
+
+
+
+
+
+WICHTIG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!s
+# Evaluation & Parameter-Sweep
+
+## Ziel
+
+Der Parameter-Sweep vergleicht automatisch mehrere Chunking-Konfigurationen (z.B. kleine, mittlere und große Chunks) anhand des Testsets und hilft dabei, die optimale Konfiguration zu finden.
+
+## Voraussetzungen
+
+- Ollama läuft (`ollama serve`)
+- Qdrant ist erreichbar (Cloud oder lokal)
+- PDFs liegen in `data/raw/pdf/`
+- URLs liegen in `data/raw/web/url.json`
+
+## Ablauf
+
+### 1. Sweep starten
+
+```bash
+py scripts/parameter_sweep.py
+```
+
+Der Sweep läuft automatisch durch alle Konfigurationen in `CONFIGURATIONS` ([scripts/parameter_sweep.py](scripts/parameter_sweep.py)). Pro Konfiguration wird:
+- der Vector Store geleert
+- alle Dokumente neu eingelesen (Ingest)
+- das gesamte Testset ausgewertet
+
+Geschätzte Laufzeit: ~15–20 Minuten pro Konfiguration.
+
+### 2. Ergebnisse
+
+Pro Konfiguration wird eine Datei gespeichert:
+
+```
+data/evaluation/
+  sweep_small_chunks.json
+  sweep_medium_chunks.json
+  sweep_large_chunks.json
+```
+
+Am Ende gibt das Skript eine Vergleichstabelle im Terminal aus:
+
+```
+  Konfiguration       Chunk  Overlap  Top-K  Guardrail  Quellen  Keywords  Ø Zeit
+  small_chunks          256       30      5        80%      90%       75%    4.2s
+  medium_chunks         512       50      5        91%      95%       83%    4.8s
+  large_chunks         1024      100      5        86%      88%       79%    5.1s
+```
+
+### 3. Automatisch gemessene Metriken
+
+| Metrik | Beschreibung |
+|---|---|
+| **Guardrail-Korrektheit** | Hat das System geantwortet wenn eine Antwort erwartet wurde, und geschwiegen wenn nicht? |
+| **Quellenangabe-Quote** | Anteil der beantworteten Fragen mit mindestens einer Quellenangabe |
+| **Keyword-Recall** | Anteil der erwarteten Schlüsselwörter, die in der Antwort vorkommen |
+| **Ø Laufzeit** | Durchschnittliche Antwortzeit pro Frage |
+
+### 4. Manuelle Bewertung
+
+Die automatischen Metriken können nicht beurteilen, ob eine Antwort inhaltlich korrekt ist. Dafür gibt es in jeder Ergebnisdatei pro Frage folgende Felder:
+
+```json
+"korrektheit": -1,      
+"vollständigkeit": -1,  
+"anmerkung": ""         
+```
+
+Skala: `0` = falsch/unvollständig · `1` = teilweise · `2` = korrekt/vollständig
+
+Diese Felder manuell anhand der Quelldokumente (PDFs, Webseiten) ausfüllen.
+
+### 5. Beste Konfiguration wählen
+
+Nach der manuellen Bewertung die Ergebnisse vergleichen:
+- Welche Konfiguration hat die höchste Guardrail-Korrektheit?
+- Welche hat den höchsten Keyword-Recall?
+- Welche beantwortet inhaltlich am korrektesten?
+
+Die gewählte Konfiguration in `.env` übernehmen:
+
+```env
+CHUNKING__CHUNK_SIZE=512
+CHUNKING__CHUNK_OVERLAP=50
+CHUNKING__TOP_K=5
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+IGNORIEREN
 """st.markdown(###
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');

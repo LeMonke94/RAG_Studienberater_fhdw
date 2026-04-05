@@ -1,90 +1,114 @@
+# RAG-Studienberater
+
+RAG-basiertes Frage-Antwort-System für FHDW-Studienberatung.
+
+---
+
 # Technologieauswahl
 
-| Technologie       | Paket                  | Zweck                                         |
-|-------------------|------------------------|-----------------------------------------------|
-| Laufzeitumgebung  | Python 3.11+           | Basis des Gesammtprojekts                     |
-| LLM  (lokal)      | qwen2.5:7b             | Generiert die Antworten                       |
-| LLM Framework     | langchain-ollama       | Verbindet LangChain mit Ollama                |
-| Text Embedding    | bge-m3                 | Wandelt Text in Vektoren um                   |
-| RAG Framework     | LangChain              | Fertige Bausteine für Pipeline                |
-| Vektordatenbank   | Qdrant                 | Speichert Chunks + Vektoren                   |
-| PDF-Extraktion    | pypdf + pdfplumber     | Extrahiert Text aus PDFs                      |
-| Web-Scraping      | BeautifulSoup4         | Extrahiert Text aus FHDW-Webseiten            |
-| User Interface    | Streamlit              | Chat-Interface ohne Frontend-Kenntnisse       |
-| Konfiguration     | pydantic-settings      | Typsichere Verwaltung von Einstellungen       |
-| Konfiguration     | python-dotenv          | Lädt .env-Datei in Umgebungsvariablen         |
-| Testing           | pytest + pytest-mock   | Automatisierte Tests                          |
-| Code-Qualität     | ruff                   | Linting und automatische Formatierung         |
-| Typ-Prüfung       | mypy                   | Statische Typprüfung vor der Ausführung       |
-| Versionskontrolle | Git                    | Code-Versionierung und Zusammenarbeit         |
-| Projektdefinition | pyproject.toml         | Metadaten, Abhängigkeiten, Tool-Konfiguration |
-langchain-text-splitters-1.1.1
+| Technologie       | Paket                      | Zweck                                          |
+|-------------------|----------------------------|------------------------------------------------|
+| Laufzeitumgebung  | Python 3.11+               | Basis des Gesamtprojekts                       |
+| LLM (lokal)       | qwen2.5:7b via Ollama      | Generiert die Antworten                        |
+| Embedding         | bge-m3 via Ollama          | Wandelt Text in Vektoren um                    |
+| Text-Splitting    | langchain-text-splitters   | Teilt Dokumente in Chunks auf                  |
+| LLM-Integration   | langchain-ollama           | Verbindet die Pipeline mit Ollama              |
+| Vektordatenbank   | Qdrant                     | Speichert Chunks und Vektoren                  |
+| PDF-Extraktion    | pdfplumber                 | Extrahiert Text aus PDFs                       |
+| Web-Scraping      | BeautifulSoup4 + requests  | Extrahiert Text aus FHDW-Webseiten             |
+| User Interface    | Streamlit                  | Chat-Interface                                 |
+| Konfiguration     | pydantic-settings          | Typsichere Verwaltung von Einstellungen        |
+| Testing           | pytest                     | Automatisierte Unit-Tests                      |
+| Code-Qualität     | ruff                       | Linting und automatische Formatierung          |
+| Typ-Prüfung       | mypy                       | Statische Typprüfung                           |
+| Projektdefinition | pyproject.toml             | Metadaten, Abhängigkeiten, Tool-Konfiguration  |
 
+---
 
-# Projektstruktur Mentales Modell
-data/ - Arbeitsdaten/Dokumente
-scripts/ - Ausführbare Skripte
+# Projektstruktur
 
-studienberater/
+```
+data/
+  raw/pdf/          FHDW-Dokumente (PDFs) die eingelesen werden
+  evaluation/       Testset und Evaluationsergebnisse
 
-    application/    Schicht der Anwendungslogik
-        services/   kleinere, klar abgegrenzte Bausteine
-        use_cases/  zusammengesetzte Abläufe für konkrete Anwendungsfälle (bestehen aus services + infrastructure + domain)
+scripts/
+  smoke_test.py     Schnelltest der gesamten Pipeline
+  evaluate.py       Systematische Evaluation anhand des Testsets
 
-    bootstrap       Verdrahtung der konkreten Abhängigkeiten
+src/rag_studienberater/
+  application/
+    services/       Einzelne, klar abgegrenzte Bausteine
+    use_cases/      Zusammengesetzte Abläufe (IngestUseCase, AnswerUseCase, ...)
+  bootstrap/        Verdrahtung aller Abhängigkeiten (Container)
+  config/           Einstellungen und Logging
+  domain/
+    models/         Datenstrukturen (Document, Chunk, Answer, ...)
+    ports/          Abstrakte Interfaces (EmbeddingPort, VectorStorePort, ...)
+  infrastructure/   Konkrete Implementierungen der Ports
+    document_loaders/
+    embedding_models/
+    language_models/
+    text_splitters/
+    vector_stores/
+  presentation/     UI-Schicht (Streamlit)
 
-    config          Einstellungen
+tests/
+  conftest.py       Stubs und Fixtures für alle Unit-Tests
+  unit/
+    services/       Tests für Application Services
+    use_cases/      Tests für Use Cases
+```
 
-    domain/         datenstrukturen
-    infrastructure/ implementierung der ports
-    presentation/
-
+---
 
 # Datenmodelle
-Dokumentstruktur
-    Document
-    Page
 
-Retrieval/Kontexstruktur
-    Chunk
-    ScoredChunk
-    RetrievalResult
+**Dokumentstruktur:** `Document` → `Page`
 
-Interaktionsstruktur
-    Query
-    Answer
+**Retrieval/Kontextstruktur:** `Chunk`, `ScoredChunk`, `RetrievalResult`
 
-# Installationsanweisung:
+**Interaktionsstruktur:** `Query`, `Answer`
+
+---
+
+# Installationsanweisung
 
 ## Voraussetzungen
 
 - Python 3.11+
 - [Ollama](https://ollama.com) installiert und gestartet
-- [Qdrant Cloud](https://cloud.qdrant.io) Account
+- [Qdrant Cloud](https://cloud.qdrant.io) Account (oder lokale Qdrant-Instanz)
 
 ## Installation
 
 **1. Repository klonen**
 ```bash
-git clone 
+git clone <repo-url>
 cd RAG_Studienberater
 ```
 
-**2. Virtuelle Umgebung erstellen**
+**2. Virtuelle Umgebung erstellen und aktivieren**
 ```bash
 python -m venv .venv
 
 # Windows:
 .venv\Scripts\activate
+
+# Linux/macOS:
+source .venv/bin/activate
 ```
 
 **3. Pakete installieren**
 ```bash
-pip install -r requirements.txt
+# Nur Laufzeit-Abhängigkeiten:
 pip install -e .
+
+# Mit Dev-Tools (pytest, ruff, mypy):
+pip install -e .[dev]
 ```
 
-**4. Ollama Modelle herunterladen**
+**4. Ollama-Modelle herunterladen**
 ```bash
 ollama pull qwen2.5:7b
 ollama pull bge-m3
@@ -94,12 +118,32 @@ ollama pull bge-m3
 
 Kopiere `.env.example` zu `.env` und trage deine Zugangsdaten ein:
 
+```bash
+cp .env.example .env
+```
+
 `.env` befüllen:
+```env
+QDRANT__ENDPOINT=https://deine-url.qdrant.io
+QDRANT__API_KEY=dein_api_key
+QDRANT__COLLECTION_NAME=studienberater
+QDRANT__VECTOR_DIMENSIONS=1024
+
+OLLAMA__BASE_URL=http://localhost:11434
+OLLAMA__LANGUAGE_MODEL=qwen2.5:7b
+OLLAMA__EMBEDDING_MODEL=bge-m3
+
+CHUNKING__CHUNK_SIZE=512
+CHUNKING__CHUNK_OVERLAP=50
+
+GUARDRAIL__MIN_SCORE=0.5
+
+LOGGING__LEVEL=INFO
 ```
-QDRANT_ENDPOINT=https://deine-url.qdrant.io
-QDRANT_API_KEY=dein_api_key
-QDRANT_COLLECTION_NAME=fhdw_studienberater
-```
+
+> **Wichtig:** Die verschachtelten Einstellungen verwenden doppelte Unterstriche (`__`) als Trennzeichen.
+
+---
 
 ## Verwendung
 
@@ -107,10 +151,21 @@ QDRANT_COLLECTION_NAME=fhdw_studienberater
 
 FHDW-PDFs in `data/raw/pdf/` ablegen, dann:
 ```bash
-python scripts/ingest.py
+py scripts/smoke_test.py
 ```
 
-**Schritt 2 — Pipeline testen**
+**Schritt 2 — Tests ausführen**
 ```bash
-python scripts/test_retrieval.py
+py -m pytest tests/ -v
 ```
+
+**Schritt 3 — Evaluation durchführen**
+```bash
+# Ingest + alle 30 Testfragen auswerten:
+py scripts/evaluate.py
+
+# Dokumente bereits geladen — Ingest überspringen:
+py scripts/evaluate.py --skip-ingest
+```
+
+Ergebnisse werden automatisch in `data/evaluation/results_<datum>.json` gespeichert.

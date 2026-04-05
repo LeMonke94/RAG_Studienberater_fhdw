@@ -6,7 +6,7 @@ from .retrieval_use_case import RetrievalUseCase
 
 
 class AnswerUseCase:
-    
+
     def __init__(
             self,
             retrieval_use_case: RetrievalUseCase,
@@ -21,6 +21,13 @@ class AnswerUseCase:
 
     def execute(self, question: str) -> Answer:
         """Nimmt eine Nutzerfrage an und gibt eine belegte Antwort zurück."""
+        if not self.guardrail_service.is_question_valid(question):
+            return Answer(
+                text=self.guardrail_service.get_invalid_question_response(),
+                sources=[],
+                has_evidence=False,
+            )
+
         query = Query(question=question)
         result = self.retrieval_use_case.execute(query)
 
@@ -30,7 +37,7 @@ class AnswerUseCase:
                 sources=[],
                 has_evidence=False,
             )
-        
+
         prompt = self.grounding_service.build_prompt(query, result)
         answer_text = self.language_model.generate(prompt)
 

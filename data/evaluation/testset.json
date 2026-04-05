@@ -1,6 +1,6 @@
 {
-  "version": "1.0",
-  "beschreibung": "Evaluations-Testset für den RAG-Studienberater FHDW. Fragen in drei Kategorien: ki_regelungen (aktuell ingested), studienberatung (zukünftige Dokumente), off_topic (Guardrail-Tests).",
+  "version": "2.0",
+  "beschreibung": "Evaluations-Testset für den RAG-Studienberater FHDW. Kategorien: ki_regelungen, studienprogramme, modulhandbuecher, off_topic. Basiert auf den tatsächlichen Dokumenten (34 PDFs + 17 Webseiten).",
   "fragen": [
     {
       "id": "Q01",
@@ -20,195 +20,230 @@
       "id": "Q03",
       "kategorie": "ki_regelungen",
       "frage": "Wie muss ich den Einsatz von KI in meiner Hausarbeit kennzeichnen?",
-      "schlüsselwörter": ["kennzeichnen", "deklarieren", "Hausarbeit", "Nutzung"],
+      "schlüsselwörter": ["kennzeichnen", "deklarieren", "Hausarbeit"],
       "erwartet_antwort": true
     },
     {
       "id": "Q04",
       "kategorie": "ki_regelungen",
       "frage": "Darf ich ChatGPT für das Schreiben von Seminararbeiten verwenden?",
-      "schlüsselwörter": ["ChatGPT", "Seminararbeit", "erlaubt", "verwenden"],
+      "schlüsselwörter": ["ChatGPT", "Seminararbeit", "erlaubt"],
       "erwartet_antwort": true
     },
     {
       "id": "Q05",
       "kategorie": "ki_regelungen",
       "frage": "Welche Konsequenzen hat nicht-deklarierte KI-Nutzung bei Prüfungsleistungen?",
-      "schlüsselwörter": ["Konsequenzen", "deklariert", "Prüfung", "Täuschung"],
+      "schlüsselwörter": ["Konsequenzen", "Prüfung", "Täuschung"],
       "erwartet_antwort": true
     },
     {
       "id": "Q06",
       "kategorie": "ki_regelungen",
-      "frage": "Gelten die KI-Regelungen für alle Studiengänge und Prüfungsformen?",
-      "schlüsselwörter": ["Studiengänge", "Prüfungsformen", "gilt", "alle"],
+      "frage": "Was versteht die FHDW unter erlaubter und nicht erlaubter KI-Nutzung?",
+      "schlüsselwörter": ["erlaubt", "nicht erlaubt", "Nutzung"],
       "erwartet_antwort": true
     },
     {
       "id": "Q07",
       "kategorie": "ki_regelungen",
-      "frage": "Darf ich KI-Tools für Programmieraufgaben im Studium einsetzen?",
-      "schlüsselwörter": ["Programmierung", "Code", "Aufgaben", "einsetzen"],
+      "frage": "Ab wann gelten die neuen KI-Regelungen an der FHDW?",
+      "schlüsselwörter": ["gültig", "2025"],
       "erwartet_antwort": true
     },
     {
       "id": "Q08",
       "kategorie": "ki_regelungen",
-      "frage": "Was versteht die FHDW unter erlaubter und nicht erlaubter KI-Nutzung?",
-      "schlüsselwörter": ["erlaubt", "nicht erlaubt", "Unterschied", "Nutzung"],
+      "frage": "Muss ich KI-generierte Inhalte in meiner Bachelorarbeit gesondert ausweisen?",
+      "schlüsselwörter": ["Bachelorarbeit", "ausweisen", "deklarieren", "KI"],
       "erwartet_antwort": true
     },
     {
       "id": "Q09",
-      "kategorie": "ki_regelungen",
-      "frage": "Ab wann gelten die neuen KI-Regelungen an der FHDW?",
-      "schlüsselwörter": ["ab", "gültig", "Datum", "2025"],
+      "kategorie": "studienprogramme",
+      "frage": "Welche Bachelorstudiengänge bietet die FHDW dual an?",
+      "schlüsselwörter": ["Bachelor", "dual", "Studiengänge", "BWL", "WI", "AI"],
       "erwartet_antwort": true
     },
     {
       "id": "Q10",
-      "kategorie": "ki_regelungen",
-      "frage": "Was muss ich beim Einsatz von KI-generierten Texten beachten?",
-      "schlüsselwörter": ["generiert", "Text", "beachten", "Nutzung"],
+      "kategorie": "studienprogramme",
+      "frage": "Welche Masterstudiengänge gibt es an der FHDW?",
+      "schlüsselwörter": ["Master", "MBA", "berufsbegleitend"],
       "erwartet_antwort": true
     },
     {
       "id": "Q11",
-      "kategorie": "studienberatung",
-      "frage": "Welche Bachelorstudiengänge bietet die FHDW an?",
-      "schlüsselwörter": ["Bachelor", "Studiengänge", "Wirtschaft", "Informatik"],
+      "kategorie": "studienprogramme",
+      "frage": "Wie ist das Bachelor-Studium Wirtschaftsinformatik an der FHDW aufgebaut?",
+      "schlüsselwörter": ["Wirtschaftsinformatik", "Semester", "Aufbau", "Module"],
       "erwartet_antwort": true
     },
     {
       "id": "Q12",
-      "kategorie": "studienberatung",
-      "frage": "Wie hoch sind die monatlichen Studiengebühren an der FHDW?",
-      "schlüsselwörter": ["Gebühren", "Euro", "monatlich", "Kosten"],
+      "kategorie": "studienprogramme",
+      "frage": "Was sind die Inhalte des dualen Bachelor-Studiums Artificial Intelligence?",
+      "schlüsselwörter": ["Artificial Intelligence", "AI", "Inhalte", "dual"],
       "erwartet_antwort": true
     },
     {
       "id": "Q13",
-      "kategorie": "studienberatung",
-      "frage": "Bis wann muss ich mich für ein Studium an der FHDW bewerben?",
-      "schlüsselwörter": ["Bewerbungsfrist", "Deadline", "bewerben", "Datum"],
+      "kategorie": "studienprogramme",
+      "frage": "Wie läuft das berufsbegleitende BWL-Studium an der FHDW ab?",
+      "schlüsselwörter": ["BWL", "berufsbegleitend", "Ablauf"],
       "erwartet_antwort": true
     },
     {
       "id": "Q14",
-      "kategorie": "studienberatung",
-      "frage": "Wie lange dauert das duale Bachelor-Studium an der FHDW?",
-      "schlüsselwörter": ["Regelstudienzeit", "Jahre", "Semester", "Dauer"],
+      "kategorie": "studienprogramme",
+      "frage": "Welche Spezialisierungen gibt es im Master Wirtschaftsinformatik an der FHDW?",
+      "schlüsselwörter": ["Master", "Wirtschaftsinformatik", "Spezialisierung"],
       "erwartet_antwort": true
     },
     {
       "id": "Q15",
-      "kategorie": "studienberatung",
-      "frage": "An welchen Standorten kann ich an der FHDW studieren?",
-      "schlüsselwörter": ["Standort", "Bielefeld", "Bergisch Gladbach", "Paderborn"],
+      "kategorie": "studienprogramme",
+      "frage": "An welchen Standorten kann ich BWL an der FHDW studieren?",
+      "schlüsselwörter": ["BWL", "Standort", "Bielefeld", "Bergisch Gladbach"],
       "erwartet_antwort": true
     },
     {
       "id": "Q16",
-      "kategorie": "studienberatung",
-      "frage": "Was ist ein duales Studium und wie funktioniert es an der FHDW?",
-      "schlüsselwörter": ["dual", "Praxisphasen", "Unternehmen", "Theorie"],
+      "kategorie": "studienprogramme",
+      "frage": "Was unterscheidet das duale vom berufsbegleitenden Studium an der FHDW?",
+      "schlüsselwörter": ["dual", "berufsbegleitend", "Unterschied", "Praxisphasen"],
       "erwartet_antwort": true
     },
     {
       "id": "Q17",
-      "kategorie": "studienberatung",
-      "frage": "Welche Zulassungsvoraussetzungen brauche ich für die Bewerbung an der FHDW?",
-      "schlüsselwörter": ["Abitur", "Fachhochschulreife", "Voraussetzungen", "Zulassung"],
+      "kategorie": "studienprogramme",
+      "frage": "Was ist das DBA-Programm der FHDW?",
+      "schlüsselwörter": ["DBA", "Doktor", "Doctor of Business Administration"],
       "erwartet_antwort": true
     },
     {
       "id": "Q18",
-      "kategorie": "studienberatung",
-      "frage": "Gibt es Stipendien oder Fördermöglichkeiten für ein Studium an der FHDW?",
-      "schlüsselwörter": ["Stipendium", "Förderung", "BAföG", "finanziell"],
+      "kategorie": "studienprogramme",
+      "frage": "Welche Wahlpflichtmodule gibt es im Bachelor BWL dual?",
+      "schlüsselwörter": ["Wahlpflicht", "BWL", "Bachelor", "dual"],
       "erwartet_antwort": true
     },
     {
       "id": "Q19",
-      "kategorie": "studienberatung",
-      "frage": "Wie ist der typische Studienablauf im ersten Semester an der FHDW?",
-      "schlüsselwörter": ["erstes Semester", "Ablauf", "Vorlesungen", "Module"],
+      "kategorie": "modulhandbuecher",
+      "frage": "Welche Module sind im ersten Semester des Bachelor AI Studiums vorgesehen?",
+      "schlüsselwörter": ["AI", "erstes Semester", "Module", "ECTS"],
       "erwartet_antwort": true
     },
     {
       "id": "Q20",
-      "kategorie": "studienberatung",
-      "frage": "Was sind die Praxisphasen im dualen Studium und wie sind sie strukturiert?",
-      "schlüsselwörter": ["Praxisphase", "Unternehmen", "Wochen", "Struktur"],
+      "kategorie": "modulhandbuecher",
+      "frage": "Wie viele ECTS-Punkte hat das Bachelor WI Studium insgesamt?",
+      "schlüsselwörter": ["ECTS", "WI", "Wirtschaftsinformatik", "gesamt"],
       "erwartet_antwort": true
     },
     {
       "id": "Q21",
-      "kategorie": "studienberatung",
-      "frage": "Bietet die FHDW auch Masterstudiengänge an?",
-      "schlüsselwörter": ["Master", "Masterstudium", "MBA", "weiterführend"],
+      "kategorie": "modulhandbuecher",
+      "frage": "Was sind die Lernziele des Moduls Projektmanagement im BWL-Studium?",
+      "schlüsselwörter": ["Projektmanagement", "Lernziele", "BWL", "Kompetenzen"],
       "erwartet_antwort": true
     },
     {
       "id": "Q22",
-      "kategorie": "studienberatung",
-      "frage": "Ist die FHDW staatlich anerkannt und akkreditiert?",
-      "schlüsselwörter": ["staatlich anerkannt", "Akkreditierung", "Hochschule"],
+      "kategorie": "modulhandbuecher",
+      "frage": "Welche Prüfungsformen gibt es im Bachelor WI an der FHDW?",
+      "schlüsselwörter": ["Prüfung", "Klausur", "Hausarbeit", "WI"],
       "erwartet_antwort": true
     },
     {
       "id": "Q23",
+      "kategorie": "modulhandbuecher",
+      "frage": "Welche Pflichtmodule enthält das Master BWL Studium?",
+      "schlüsselwörter": ["Master", "BWL", "Pflichtmodule"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q24",
+      "kategorie": "modulhandbuecher",
+      "frage": "Was wird im Modul Statistik im Bachelor BWL vermittelt?",
+      "schlüsselwörter": ["Statistik", "BWL", "Inhalte", "Lehrveranstaltung"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q25",
+      "kategorie": "modulhandbuecher",
+      "frage": "Gibt es im Bachelor AI ein Modul zu maschinellem Lernen?",
+      "schlüsselwörter": ["maschinelles Lernen", "Machine Learning", "AI", "Modul"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q26",
+      "kategorie": "modulhandbuecher",
+      "frage": "Wie ist die Bachelorarbeit im WI-Studium geregelt — wie viele ECTS und was wird erwartet?",
+      "schlüsselwörter": ["Bachelorarbeit", "ECTS", "WI", "Abschluss"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q27",
+      "kategorie": "modulhandbuecher",
+      "frage": "Welche Fremdsprachen-Module gibt es im MBA-Studium der FHDW?",
+      "schlüsselwörter": ["MBA", "Sprache", "Englisch", "Fremdsprache"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q28",
+      "kategorie": "modulhandbuecher",
+      "frage": "Was sind die Voraussetzungen für die Zulassung zur Masterarbeit an der FHDW?",
+      "schlüsselwörter": ["Masterarbeit", "Zulassung", "Voraussetzungen", "ECTS"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q29",
       "kategorie": "off_topic",
       "frage": "Was ist die Hauptstadt von Frankreich?",
       "schlüsselwörter": [],
       "erwartet_antwort": false
     },
     {
-      "id": "Q24",
+      "id": "Q30",
       "kategorie": "off_topic",
       "frage": "Wie wird das Wetter morgen in Bielefeld?",
       "schlüsselwörter": [],
       "erwartet_antwort": false
     },
     {
-      "id": "Q25",
+      "id": "Q31",
       "kategorie": "off_topic",
       "frage": "Kannst du mir ein Rezept für Spaghetti Carbonara empfehlen?",
       "schlüsselwörter": [],
       "erwartet_antwort": false
     },
     {
-      "id": "Q26",
+      "id": "Q32",
       "kategorie": "off_topic",
       "frage": "Wer hat die letzte Fußball-Weltmeisterschaft gewonnen?",
       "schlüsselwörter": [],
       "erwartet_antwort": false
     },
     {
-      "id": "Q27",
-      "kategorie": "off_topic",
-      "frage": "Wie lautet der aktuelle Bitcoin-Kurs?",
-      "schlüsselwörter": [],
-      "erwartet_antwort": false
-    },
-    {
-      "id": "Q28",
-      "kategorie": "off_topic",
-      "frage": "Erkläre mir die Relativitätstheorie von Einstein.",
-      "schlüsselwörter": [],
-      "erwartet_antwort": false
-    },
-    {
-      "id": "Q29",
+      "id": "Q33",
       "kategorie": "off_topic",
       "frage": "Schreibe mir ein Python-Skript zum Sortieren einer Liste.",
       "schlüsselwörter": [],
       "erwartet_antwort": false
     },
     {
-      "id": "Q30",
+      "id": "Q34",
       "kategorie": "off_topic",
-      "frage": "Was ist die beste Pizzeria in Düsseldorf?",
+      "frage": "Erkläre mir die Quantenmechanik.",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q35",
+      "kategorie": "off_topic",
+      "frage": "Wie investiere ich am besten in ETFs?",
       "schlüsselwörter": [],
       "erwartet_antwort": false
     }

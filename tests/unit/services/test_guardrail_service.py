@@ -52,6 +52,37 @@ class TestGuardrailServiceHasSufficientEvidence:
         assert svc.has_sufficient_evidence(result) is False
 
 
+class TestGuardrailServiceIsQuestionValid:
+
+    def test_short_question_is_invalid(self):
+        svc = GuardrailService()
+        assert svc.is_question_valid('hi') is False
+
+    def test_empty_string_is_invalid(self):
+        svc = GuardrailService()
+        assert svc.is_question_valid('') is False
+
+    def test_only_whitespace_is_invalid(self):
+        svc = GuardrailService()
+        assert svc.is_question_valid('   ') is False
+
+    def test_question_at_min_length_is_valid(self):
+        svc = GuardrailService(min_question_length=10)
+        assert svc.is_question_valid('Was kostet?') is True  # 11 Zeichen
+
+    def test_question_below_min_length_is_invalid(self):
+        svc = GuardrailService(min_question_length=10)
+        assert svc.is_question_valid('Hallo') is False
+
+    def test_custom_min_length(self):
+        svc = GuardrailService(min_question_length=5)
+        assert svc.is_question_valid('Hallo') is True
+
+    def test_invalid_question_response_is_nonempty(self):
+        svc = GuardrailService()
+        assert len(svc.get_invalid_question_response()) > 0
+
+
 class TestGuardrailServiceNoEvidenceResponse:
 
     def test_returns_nonempty_string(self):

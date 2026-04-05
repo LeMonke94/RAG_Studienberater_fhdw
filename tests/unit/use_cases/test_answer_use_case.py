@@ -16,6 +16,32 @@ def make_answer_use_case(stub_retrieval_uc, stub_llm, min_score: float = 0.5) ->
     )
 
 
+class TestAnswerUseCaseTooShort:
+    """Frage zu kurz → sofortige Ablehnung ohne Retrieval."""
+
+    def test_short_question_returns_no_evidence(self, stub_retrieval_uc, stub_llm):
+        uc = make_answer_use_case(stub_retrieval_uc, stub_llm)
+        answer = uc.execute('hi')
+        assert answer.has_evidence is False
+
+    def test_short_question_does_not_call_llm(self, stub_retrieval_uc, stub_llm):
+        uc = make_answer_use_case(stub_retrieval_uc, stub_llm)
+        uc.execute('hi')
+        assert stub_llm.call_count == 0
+
+    def test_short_question_does_not_call_retrieval(self, stub_retrieval_uc, stub_llm):
+        uc = make_answer_use_case(stub_retrieval_uc, stub_llm)
+        uc.execute('hi')
+        # Retrieval-Stub has no call_count — : sources is empty
+        assert stub_llm.call_count == 0
+
+    def test_question_at_min_length_proceeds(self, stub_retrieval_uc, stub_llm, make_scored_chunk):
+        stub_retrieval_uc.result = RetrievalResult(scored_chunks=[make_scored_chunk(score=0.9)])
+        uc = make_answer_use_case(stub_retrieval_uc, stub_llm)
+        answer = uc.execute('Was kostet?')  # exactly 11 symbols
+        assert answer.has_evidence is True
+
+
 class TestAnswerUseCaseNoEvidence:
     """Guardrail blockiert → kein LLM-Aufruf."""
 
@@ -23,28 +49,28 @@ class TestAnswerUseCaseNoEvidence:
     def test_has_evidence_is_false(self, stub_retrieval_uc, stub_llm):
         stub_retrieval_uc.result = RetrievalResult(scored_chunks=[])
         uc = make_answer_use_case(stub_retrieval_uc, stub_llm)
-        answer = uc.execute('Frage?')
+        answer = uc.execute('Was ist das Studium?')
         assert answer.has_evidence is False
 
     # No source scenario
     def test_sources_is_empty(self, stub_retrieval_uc, stub_llm):
         stub_retrieval_uc.result = RetrievalResult(scored_chunks=[])
         uc = make_answer_use_case(stub_retrieval_uc, stub_llm)
-        answer = uc.execute('Frage?')
+        answer = uc.execute('Was ist das Studium?')
         assert answer.sources == []
 
     # Assure LLM didnt get called if blocked
     def test_llm_is_not_called(self, stub_retrieval_uc, stub_llm):
         stub_retrieval_uc.result = RetrievalResult(scored_chunks=[])
         uc = make_answer_use_case(stub_retrieval_uc, stub_llm)
-        uc.execute('Frage?')
+        uc.execute('Was ist das Studium?')
         assert stub_llm.call_count == 0
 
     # Answer must not be empty
     def test_response_text_is_nonempty(self, stub_retrieval_uc, stub_llm):
         stub_retrieval_uc.result = RetrievalResult(scored_chunks=[])
         uc = make_answer_use_case(stub_retrieval_uc, stub_llm)
-        answer = uc.execute('Frage?')
+        answer = uc.execute('Was ist das Studium?')
         assert len(answer.text) > 0
 
     # Bad evidence for chunks scenario
@@ -54,7 +80,7 @@ class TestAnswerUseCaseNoEvidence:
             make_scored_chunk(score=0.3),
         ])
         uc = make_answer_use_case(stub_retrieval_uc, stub_llm, min_score=0.5)
-        answer = uc.execute('Frage?')
+        answer = uc.execute('Was ist das Studium?')
         assert answer.has_evidence is False
 
 
@@ -65,7 +91,7 @@ class TestAnswerUseCaseWithEvidence:
     def test_has_evidence_is_true(self, stub_retrieval_uc, stub_llm, make_scored_chunk):
         stub_retrieval_uc.result = RetrievalResult(scored_chunks=[make_scored_chunk(score=0.9)])
         uc = make_answer_use_case(stub_retrieval_uc, stub_llm)
-        answer = uc.execute('Frage?')
+        answer = uc.execute('Was ist das Studium?')
         assert answer.has_evidence is True
 
     # LLM answer should not be edited
@@ -73,14 +99,14 @@ class TestAnswerUseCaseWithEvidence:
         stub_retrieval_uc.result = RetrievalResult(scored_chunks=[make_scored_chunk(score=0.9)])
         stub_llm.response = "Das Studium kostet 500 Euro pro Monat."
         uc = make_answer_use_case(stub_retrieval_uc, stub_llm)
-        answer = uc.execute('Frage?')
+        answer = uc.execute('Was ist das Studium?')
         assert answer.text == "Das Studium kostet 500 Euro pro Monat."
 
     # Assure LLM is being called only once
     def test_llm_is_called_exactly_once(self, stub_retrieval_uc, stub_llm, make_scored_chunk):
         stub_retrieval_uc.result = RetrievalResult(scored_chunks=[make_scored_chunk(score=0.9)])
         uc = make_answer_use_case(stub_retrieval_uc, stub_llm)
-        uc.execute('Frage?')
+        uc.execute('Was ist das Studium?')
         assert stub_llm.call_count == 1
 
     # Assure right chunk is being given back
@@ -88,7 +114,7 @@ class TestAnswerUseCaseWithEvidence:
         sc = make_scored_chunk(score=0.9)
         stub_retrieval_uc.result = RetrievalResult(scored_chunks=[sc])
         uc = make_answer_use_case(stub_retrieval_uc, stub_llm)
-        answer = uc.execute('Frage?')
+        answer = uc.execute('Was ist das Studium?')
         assert sc.chunk in answer.sources
 
     # Question should be in the prompt

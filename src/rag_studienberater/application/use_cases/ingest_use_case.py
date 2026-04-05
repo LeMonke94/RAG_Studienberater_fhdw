@@ -80,7 +80,7 @@ class IngestUseCase:
 
         files = list(folder_path.rglob('*.pdf'))
 
-        logger.info(f"{len(files)} PDFs gefunden in {folder} (inkl. Unterordner)")
+        logger.info(f'{len(files)} PDFs gefunden in {folder} (inkl. Unterordner)')
 
         for file_path in files:
             logger.info(f'Verarbeite: {file_path.name}')
@@ -102,16 +102,12 @@ class IngestUseCase:
                 logger.warning(f'{url} konnte nicht verarbeitet werden: {e}')
 
     def execute_urls_from_file(self, json_path: str) -> None:
-        """URLs aus einer JSON-Datei einlesen und im Vector-Store speichern.
-
-        Erwartet folgendes Format:
-            {"urls": ["https://...", "https://..."]}
-        """
+        """URLs aus einer JSON-Datei einlesen und im Vector-Store speichern."""
 
         path = Path(json_path)
         with path.open(encoding='utf-8') as f:
             data = json.load(f)
 
         urls: list[str] = data.get('urls', [])
-        logger.info(f"{len(urls)} URLs gefunden in {json_path}")
+        logger.info(f'{len(urls)} URLs gefunden in {json_path}')
         self.execute_urls(urls)

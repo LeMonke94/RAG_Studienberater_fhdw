@@ -24,13 +24,13 @@ from dataclasses import dataclass
 # Reuse evaluation logic from evaluate.py
 sys.path.insert(0, str(Path(__file__).parent))
 from evaluate import (
-    EvaluationsBericht,
-    FrageErgebnis,
-    berechne_bericht_metriken,
-    drucke_zusammenfassung,
-    lade_testset,
-    score_ergebnis,
-    symbol,
+    EvaluationReport,
+    QuestionResult,
+    calculate_report_metrics,
+    print_summary,
+    load_testset,
+    score_result,
+    get_symbol,
 )
 
 
@@ -58,7 +58,7 @@ def run_sweep(testset_path: str, pdf_folder: str, url_json: str, output_dir: str
     print(f'  {len(CONFIGURATIONS)} Konfigurationen × 35 Fragen')
     print(f'  Geschätzte Laufzeit: {len(CONFIGURATIONS) * 15}–{len(CONFIGURATIONS) * 20} Minuten\n')
 
-    results: list[tuple[Configuration, str, EvaluationsBericht]] = []
+    results: list[tuple[Configuration, str, EvaluationReport]] = []
 
     for i, config in enumerate(CONFIGURATIONS, start=1):
         print(f"\n{'─' * 80}")
@@ -127,21 +127,21 @@ def _create_container(config: Configuration):
 
 def _run_evaluation(
     container, testset_path: str, output_dir: str, config: Configuration
-) -> tuple[str, EvaluationsBericht]:
+) -> tuple[str, EvaluationReport]:
     """Runs evaluation for one configuration and returns (file_path, report)."""
-    questions = lade_testset(testset_path)
-    report = EvaluationsBericht(
-        zeitstempel=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        testset_pfad=testset_path,
+    questions = load_testset(testset_path)
+    report = EvaluationReport(
+        timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        testset_path=testset_path,
     )
 
     for i, question_data in enumerate(questions, start=1):
-        question_text    = question_data['frage']
-        ergebnis = FrageErgebnis(
+        question_text = question_data['frage']
+        result = QuestionResult(
             id=question_data.get('id', f'Q{i:02d}'),
-            kategorie=question_data.get('kategorie', 'unbekannt'),
-            frage=question_text,
-            erwartet_antwort=question_data.get('erwartet_antwort', True),
+            category=question_data.get('kategorie', 'unbekannt'),
+            question=question_text,
+            expected_answer=question_data.get('erwartet_antwort', True),
         )
 
         print(f'  [{i:02d}/{len(questions)}] {question_text[:70]}', end='', flush=True)
@@ -149,22 +149,22 @@ def _run_evaluation(
         try:
             t0 = time.perf_counter()
             answer = container.answer_use_case.execute(question_text)
-            ergebnis.laufzeit_sek = time.perf_counter() - t0
-            ergebnis.hat_antwort  = answer.has_evidence
-            ergebnis.antwort_text = answer.text
-            ergebnis.quellen      = list({
+            result.runtime_sec = time.perf_counter() - t0
+            result.has_answer   = answer.has_evidence
+            result.answer_text  = answer.text
+            result.sources      = list({
                 f'{chunk.source} S.{chunk.page}' if chunk.page else chunk.source
                 for chunk in answer.sources
             })
         except Exception as exc:
-            ergebnis.antwort_text = f'[FEHLER: {exc}]'
+            result.answer_text = f'[FEHLER: {exc}]'
 
-        score_ergebnis(ergebnis, question_data)
-        print(f'  {symbol(ergebnis.guardrail_korrekt)}  ({ergebnis.laufzeit_sek:.1f}s)')
-        report.ergebnisse.append(ergebnis)
+        score_result(result, question_data)
+        print(f'  {get_symbol(result.guardrail_correct)}  ({result.runtime_sec:.1f}s)')
+        report.results.append(result)
 
-    berechne_bericht_metriken(report)
-    drucke_zusammenfassung(report)
+    calculate_report_metrics(report)
+    print_summary(report)
 
     # Save with config name so files are easy to identify
     Path(output_dir).mkdir(parents=True, exist_ok=True)
@@ -175,7 +175,7 @@ def _run_evaluation(
     return path, report
 
 
-def _print_comparison(results: list[tuple[Configuration, str, EvaluationsBericht]]) -> None:
+def _print_comparison(results: list[tuple[Configuration, str, EvaluationReport]]) -> None:
     """Prints a comparison table of all configurations."""
     print(f"\n\n{'═' * 80}")
     print('  VERGLEICH ALLER KONFIGURATIONEN')
@@ -192,10 +192,10 @@ def _print_comparison(results: list[tuple[Configuration, str, EvaluationsBericht
             f'{config.chunk_size:>6} '
             f'{config.chunk_overlap:>8} '
             f'{config.top_k:>6} '
-            f'{report.guardrail_korrektheit:>9.0%} '
-            f'{report.quellenangabe_quote:>7.0%} '
-            f'{report.durchschnittlicher_keyword_recall:>8.0%} '
-            f'{report.durchschnittliche_laufzeit_sek:>6.1f}s'
+            f'{report.guardrail_accuracy:>9.0%} '
+            f'{report.source_citation_rate:>7.0%} '
+            f'{report.average_keyword_recall:>8.0%} '
+            f'{report.average_runtime_sec:>6.1f}s'
         )
 
     print(f'\n  Ergebnisdateien:')

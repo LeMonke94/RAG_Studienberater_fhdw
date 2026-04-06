@@ -75,7 +75,7 @@ def score_result(result: QuestionResult, question_data: dict) -> None:
     # Calculate how many of the expected keywords were mentioned
     result.keyword_recall = calculate_keyword_recall(
         result.answer_text,
-        question_data.get("keywords", [])
+        question_data.get("schlüsselwörter", [])
     )
 
 

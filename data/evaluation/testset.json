@@ -1,6 +1,6 @@
 {
-  "version": "2.0",
-  "beschreibung": "Evaluations-Testset für den RAG-Studienberater FHDW. Kategorien: ki_regelungen, studienprogramme, modulhandbuecher, off_topic. Basiert auf den tatsächlichen Dokumenten (34 PDFs + 17 Webseiten).",
+  "version": "2.1",
+  "beschreibung": "Evaluations-Testset für den RAG-Studienberater FHDW. Kategorien: ki_regelungen, studienprogramme, modulhandbuecher, grenzfall, off_topic. Basiert auf den tatsächlichen Dokumenten (34 PDFs + 17 Webseiten).",
   "fragen": [
     {
       "id": "Q01",
@@ -200,50 +200,99 @@
     },
     {
       "id": "Q29",
+      "kategorie": "studienprogramme",
+      "frage": "Wie kann ich mich für ein duales Studium an der FHDW bewerben?",
+      "schlüsselwörter": ["Bewerbung", "bewerben", "Zulassung"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q30",
+      "kategorie": "studienprogramme",
+      "frage": "Welche Zugangsvoraussetzungen gelten für ein Studium an der FHDW?",
+      "schlüsselwörter": ["Voraussetzungen", "Hochschulzugangsberechtigung", "Zugang"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q31",
+      "kategorie": "studienprogramme",
+      "frage": "Gibt es Informationen zu den Studiengebühren oder Studienkosten an der FHDW?",
+      "schlüsselwörter": ["Kosten", "Gebühren", "Studiengebühren"],
+      "erwartet_antwort": true
+    },
+    {
+      "id": "Q32",
+      "kategorie": "grenzfall",
+      "frage": "Wie hoch ist das durchschnittliche Einstiegsgehalt nach einem FHDW-Abschluss?",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q33",
+      "kategorie": "grenzfall",
+      "frage": "Wie ist die FHDW im CHE-Hochschulranking bewertet?",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q34",
+      "kategorie": "grenzfall",
+      "frage": "Wie viele Studierende sind aktuell an der FHDW eingeschrieben?",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q36",
       "kategorie": "off_topic",
       "frage": "Was ist die Hauptstadt von Frankreich?",
       "schlüsselwörter": [],
       "erwartet_antwort": false
     },
     {
-      "id": "Q30",
-      "kategorie": "off_topic",
-      "frage": "Wie wird das Wetter morgen in Bielefeld?",
-      "schlüsselwörter": [],
-      "erwartet_antwort": false
-    },
-    {
-      "id": "Q31",
+      "id": "Q37",
       "kategorie": "off_topic",
       "frage": "Kannst du mir ein Rezept für Spaghetti Carbonara empfehlen?",
       "schlüsselwörter": [],
       "erwartet_antwort": false
     },
     {
-      "id": "Q32",
+      "id": "Q38",
       "kategorie": "off_topic",
       "frage": "Wer hat die letzte Fußball-Weltmeisterschaft gewonnen?",
       "schlüsselwörter": [],
       "erwartet_antwort": false
     },
     {
-      "id": "Q33",
+      "id": "Q39",
       "kategorie": "off_topic",
       "frage": "Schreibe mir ein Python-Skript zum Sortieren einer Liste.",
       "schlüsselwörter": [],
       "erwartet_antwort": false
     },
     {
-      "id": "Q34",
+      "id": "Q40",
       "kategorie": "off_topic",
       "frage": "Erkläre mir die Quantenmechanik.",
       "schlüsselwörter": [],
       "erwartet_antwort": false
     },
     {
-      "id": "Q35",
+      "id": "Q41",
       "kategorie": "off_topic",
       "frage": "Wie investiere ich am besten in ETFs?",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q42",
+      "kategorie": "off_topic",
+      "frage": "Welche Hochschulen in NRW sind besser als die FHDW?",
+      "schlüsselwörter": [],
+      "erwartet_antwort": false
+    },
+    {
+      "id": "Q43",
+      "kategorie": "off_topic",
+      "frage": "Wie wird das Wetter morgen in Bielefeld?",
       "schlüsselwörter": [],
       "erwartet_antwort": false
     }

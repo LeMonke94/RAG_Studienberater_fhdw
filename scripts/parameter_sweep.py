@@ -1,11 +1,19 @@
 """
 Parameter-Sweep
 
-Testet automatisch verschiedene Konfigurationen und vergleicht die Ergebnisse.
-Jede Konfiguration: Qdrant leeren → Ingest → Evaluate.
+Testet alle Kombinationen aus Chunk-Konfiguration und Top-K.
+Pro Chunk-Konfiguration wird nur einmal ingested — Top-K-Varianten
+nutzen denselben Vector Store.
 
-HINWEIS: Ein Durchlauf dauert ~10-20 Minuten (Ingest + 35 Fragen).
-         Bei 3 Konfigurationen = ~30-60 Minuten Gesamtlaufzeit.
+Ablauf pro Chunk-Config:
+    Qdrant leeren → Ingest → Evaluate(top_k=5) → Evaluate(top_k=10)
+
+Ergebnisse:
+    data/evaluation/top_k_5/sweep_<chunk>.json
+    data/evaluation/top_k_10/sweep_<chunk>.json
+
+HINWEIS: Ein Durchlauf dauert ~10-20 Minuten (Ingest + 2 × 42 Fragen).
+         Bei 3 Chunk-Configs = ~30-60 Minuten Gesamtlaufzeit.
 
 Verwendung:
     py scripts/parameter_sweep.py
@@ -16,10 +24,9 @@ Verwendung:
 import json
 import sys
 import time
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from dataclasses import dataclass
 
 # Reuse evaluation logic from evaluate.py
 sys.path.insert(0, str(Path(__file__).parent))
@@ -34,49 +41,60 @@ from evaluate import (
 )
 
 
-# Configs to compare
+# Chunk configurations — top_k is varied separately
 @dataclass
-class Configuration:
+class ChunkConfig:
     name: str
     chunk_size: int
     chunk_overlap: int
+
+
+@dataclass
+class SweepResult:
+    chunk_config: ChunkConfig
     top_k: int
+    report_path: str
+    report: EvaluationReport
 
 
-CONFIGURATIONS = [
-    Configuration(name='small_chunks',  chunk_size=256,  chunk_overlap=30,  top_k=5),
-    Configuration(name='medium_chunks', chunk_size=512,  chunk_overlap=50,  top_k=5),
-    Configuration(name='large_chunks',  chunk_size=1024, chunk_overlap=100, top_k=5),
+CHUNK_CONFIGS = [
+    ChunkConfig(name='small',  chunk_size=256,  chunk_overlap=30),
+    ChunkConfig(name='medium', chunk_size=512,  chunk_overlap=50),
+    ChunkConfig(name='large',  chunk_size=1024, chunk_overlap=100),
 ]
+
+TOP_K_VALUES = [5, 10]
 
 
 # Sweep logic
-def run_sweep(testset_path: str, pdf_folder: str, url_json: str, output_dir: str) -> None:
+def run_sweep(testset_path: str, pdf_folder: str, url_json: str, output_base_dir: str) -> None:
+    total_runs = len(CHUNK_CONFIGS) * len(TOP_K_VALUES)
     print(f"\n{'═' * 80}")
     print('  PARAMETER-SWEEP — RAG-STUDIENBERATER')
     print(f"{'═' * 80}")
-    print(f'  {len(CONFIGURATIONS)} Konfigurationen × 35 Fragen')
-    print(f'  Geschätzte Laufzeit: {len(CONFIGURATIONS) * 15}–{len(CONFIGURATIONS) * 20} Minuten\n')
+    print(f'  {len(CHUNK_CONFIGS)} Chunk-Configs × {len(TOP_K_VALUES)} Top-K-Werte = {total_runs} Evaluationen')
+    print(f'  Ingest: {len(CHUNK_CONFIGS)}× (Top-K-Varianten teilen denselben Vector Store)')
+    print(f'  Geschätzte Laufzeit: {len(CHUNK_CONFIGS) * 15}–{len(CHUNK_CONFIGS) * 20} Minuten\n')
 
-    results: list[tuple[Configuration, str, EvaluationReport]] = []
+    all_results: list[SweepResult] = []
 
-    for i, config in enumerate(CONFIGURATIONS, start=1):
+    for i, chunk_config in enumerate(CHUNK_CONFIGS, start=1):
         print(f"\n{'─' * 80}")
-        print(f'  [{i}/{len(CONFIGURATIONS)}] Konfiguration: {config.name}')
-        print(f'       chunk_size={config.chunk_size}  chunk_overlap={config.chunk_overlap}  top_k={config.top_k}')
+        print(f'  [{i}/{len(CHUNK_CONFIGS)}] Chunk-Config: {chunk_config.name}  '
+              f'(size={chunk_config.chunk_size}, overlap={chunk_config.chunk_overlap})')
         print(f"{'─' * 80}\n")
 
-        start = time.perf_counter()
+        ingest_start = time.perf_counter()
 
-        # Initialise container with this config
+        # Initialise container for ingest (top_k irrelevant here)
         try:
-            container = _create_container(config)
+            container = _create_container(chunk_config, top_k=TOP_K_VALUES[0])
         except Exception as e:
             print(f'  FEHLER beim Initialisieren: {e}')
             print('  Stelle sicher, dass Ollama und Qdrant laufen.\n')
             sys.exit(1)
 
-        # Empty vector store
+        # Clear vector store
         print('  Leere Vector Store...')
         try:
             container.retrieval_use_case.retrieval_service.vector_store.clear()
@@ -84,7 +102,7 @@ def run_sweep(testset_path: str, pdf_folder: str, url_json: str, output_dir: str
         except Exception as e:
             print(f'  WARNUNG: Leeren fehlgeschlagen: {e}')
 
-        # Ingest
+        # Ingest once for this chunk config
         print(f"\n  Ingest PDFs aus '{pdf_folder}'...")
         try:
             container.ingest_use_case.execute_folder(pdf_folder)
@@ -97,27 +115,37 @@ def run_sweep(testset_path: str, pdf_folder: str, url_json: str, output_dir: str
         except Exception as e:
             print(f'  WARNUNG: URL-Ingest fehlgeschlagen: {e}')
 
-        # Evaluation
-        print(f'\n  Starte Evaluation ({testset_path})...')
-        path, report = _run_evaluation(container, testset_path, output_dir, config)
-        results.append((config, path, report))
+        ingest_duration = time.perf_counter() - ingest_start
+        print(f'  Ingest abgeschlossen in {ingest_duration/60:.1f} Minuten.\n')
 
-        duration = time.perf_counter() - start
-        print(f"\n  Konfiguration '{config.name}' abgeschlossen in {duration/60:.1f} Minuten.")
-        print(f'  Ergebnis: {path}')
+        # Evaluate for each top_k — no re-ingest needed
+        for top_k in TOP_K_VALUES:
+            print(f"  {'─' * 40}")
+            print(f'  Evaluation mit top_k={top_k}...')
+            print(f"  {'─' * 40}\n")
 
-    # Comparison table
-    _print_comparison(results)
+            eval_container = _create_container(chunk_config, top_k=top_k)
+            output_dir = str(Path(output_base_dir) / f'top_k_{top_k}')
+
+            path, report = _run_evaluation(
+                container=eval_container,
+                testset_path=testset_path,
+                output_dir=output_dir,
+                config_name=chunk_config.name,
+            )
+            all_results.append(SweepResult(chunk_config, top_k, path, report))
+            print(f'  Ergebnis gespeichert: {path}\n')
+
+    _print_comparison(all_results)
 
 
-def _create_container(config: Configuration):
-    """Creates a container with overridden chunking parameters."""
+def _create_container(chunk_config: ChunkConfig, top_k: int):
+    """Creates a container with the given chunk config and top_k."""
     import os
-    os.environ['CHUNKING__CHUNK_SIZE']    = str(config.chunk_size)
-    os.environ['CHUNKING__CHUNK_OVERLAP'] = str(config.chunk_overlap)
-    os.environ['CHUNKING__TOP_K']         = str(config.top_k)
+    os.environ['CHUNKING__CHUNK_SIZE']    = str(chunk_config.chunk_size)
+    os.environ['CHUNKING__CHUNK_OVERLAP'] = str(chunk_config.chunk_overlap)
+    os.environ['CHUNKING__TOP_K']         = str(top_k)
 
-    # Clear settings cache so new env values are picked up
     from rag_studienberater.config.settings import get_settings
     get_settings.cache_clear()
 
@@ -126,9 +154,9 @@ def _create_container(config: Configuration):
 
 
 def _run_evaluation(
-    container, testset_path: str, output_dir: str, config: Configuration
+    container, testset_path: str, output_dir: str, config_name: str
 ) -> tuple[str, EvaluationReport]:
-    """Runs evaluation for one configuration and returns (file_path, report)."""
+    """Runs evaluation for one container configuration and returns (file_path, report)."""
     questions = load_testset(testset_path)
     report = EvaluationReport(
         timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -166,42 +194,63 @@ def _run_evaluation(
     calculate_report_metrics(report)
     print_summary(report)
 
-    # Save with config name so files are easy to identify
     Path(output_dir).mkdir(parents=True, exist_ok=True)
-    path = str(Path(output_dir) / f'sweep_{config.name}.json')
+    path = str(Path(output_dir) / f'sweep_{config_name}.json')
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(asdict(report), f, ensure_ascii=False, indent=2)
 
     return path, report
 
 
-def _print_comparison(results: list[tuple[Configuration, str, EvaluationReport]]) -> None:
-    """Prints a comparison table of all configurations."""
+def _print_comparison(results: list[SweepResult]) -> None:
+    """Prints a grouped comparison table: chunk configs as rows, top_k as column groups."""
     print(f"\n\n{'═' * 80}")
     print('  VERGLEICH ALLER KONFIGURATIONEN')
     print(f"{'═' * 80}\n")
 
-    col = 18
-    print(f"  {'Konfiguration':<{col}} {'Chunk':>6} {'Overlap':>8} {'Top-K':>6} "
-          f"{'Guardrail':>10} {'Quellen':>8} {'Keywords':>9} {'Ø Zeit':>7}")
-    print(f"  {'─'*col} {'─'*6} {'─'*8} {'─'*6} {'─'*10} {'─'*8} {'─'*9} {'─'*7}")
+    # Header
+    col = 10
+    tk_w = 36  # width per top_k group
+    print(f"  {'':>{col}}  ", end='')
+    for top_k in TOP_K_VALUES:
+        label = f'top_k={top_k}'
+        print(f"  {label:^{tk_w}}", end='')
+    print()
 
-    for config, path, report in results:
-        print(
-            f'  {config.name:<{col}} '
-            f'{config.chunk_size:>6} '
-            f'{config.chunk_overlap:>8} '
-            f'{config.top_k:>6} '
-            f'{report.guardrail_accuracy:>9.0%} '
-            f'{report.source_citation_rate:>7.0%} '
-            f'{report.average_keyword_recall:>8.0%} '
-            f'{report.average_runtime_sec:>6.1f}s'
-        )
+    print(f"  {'Chunk':<{col}}  ", end='')
+    for _ in TOP_K_VALUES:
+        print(f"  {'Guardrail':>9} {'Quellen':>7} {'Keywords':>8} {'Ø Zeit':>6}  ", end='')
+    print()
 
+    print(f"  {'─'*col}  ", end='')
+    for _ in TOP_K_VALUES:
+        print(f"  {'─'*9} {'─'*7} {'─'*8} {'─'*6}  ", end='')
+    print()
+
+    # Rows grouped by chunk config
+    for chunk_config in CHUNK_CONFIGS:
+        print(f"  {chunk_config.name:<{col}}  ", end='')
+        for top_k in TOP_K_VALUES:
+            match = next((r for r in results if r.chunk_config.name == chunk_config.name and r.top_k == top_k), None)
+            if match:
+                r = match.report
+                print(
+                    f"  {r.guardrail_accuracy:>8.0%} "
+                    f"{r.source_citation_rate:>7.0%} "
+                    f"{r.average_keyword_recall:>8.0%} "
+                    f"{r.average_runtime_sec:>5.1f}s  ",
+                    end=''
+                )
+            else:
+                print(f"  {'–':>8} {'–':>7} {'–':>8} {'–':>6}  ", end='')
+        print()
+
+    # File list
     print(f'\n  Ergebnisdateien:')
-    for _, path, _ in results:
-        print(f'    {path}')
+    for res in results:
+        print(f'    top_k={res.top_k}  {res.chunk_config.name:<8}  {res.report_path}')
     print(f"\n{'═' * 80}\n")
+
 
 # Entry point
 if __name__ == '__main__':
@@ -217,5 +266,5 @@ if __name__ == '__main__':
         testset_path=args.testset,
         pdf_folder=args.pdf_folder,
         url_json=args.url_json,
-        output_dir=args.output,
+        output_base_dir=args.output,
     )

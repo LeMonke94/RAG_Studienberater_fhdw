@@ -1,11 +1,11 @@
 # Imports
 from dataclasses import dataclass
 
-from .chunk import Chunk
+from .scored_chunk import ScoredChunk
 
 
 @dataclass
 class Answer:
     text: str
-    sources: list[Chunk]
+    sources: list[ScoredChunk]
     has_evidence: bool

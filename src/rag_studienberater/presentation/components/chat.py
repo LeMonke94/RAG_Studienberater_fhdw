@@ -68,9 +68,9 @@ def _render_sources(sources: list[str]) -> None:
             st.markdown(f"- {source}")
 
 def _format_sources(answer: Answer) -> list[str]:
-    """Wandelt Chunk-Objekte in lesbare Quellenstrings um."""
+    """Wandelt ScoredChunk-Objekte in lesbare Quellenstrings um."""
     return sorted({
-        f"**{chunk.source}**, Seite {chunk.page}" if chunk.page
-        else f"**{chunk.source}**"
-        for chunk in answer.sources
+        f"**{sc.chunk.source}**, Seite {sc.chunk.page}" if sc.chunk.page
+        else f"**{sc.chunk.source}**"
+        for sc in answer.sources
     })

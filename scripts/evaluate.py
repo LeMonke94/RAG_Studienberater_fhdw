@@ -32,6 +32,10 @@ class QuestionResult:
     sources: list[str] = field(default_factory=list)
     runtime_sec: float = 0.0
 
+    # Retrieval Scores
+    top_score: float = 0.0               # Highest similarity score among retrieved chunks
+    avg_score: float = 0.0               # Average similarity score among retrieved chunks
+
     # Automated Metrics
     guardrail_correct: bool = False      # System behaves as expected (Answer / No Answer)
     has_sources: bool = False            # Answer contains source citations
@@ -51,6 +55,8 @@ class EvaluationReport:
     source_citation_rate: float = 0.0
     average_keyword_recall: float = 0.0
     average_runtime_sec: float = 0.0
+    average_top_score: float = 0.0       # Ø top retrieval score across all answered questions
+    average_avg_score: float = 0.0       # Ø mean retrieval score across all answered questions
     results: list[QuestionResult] = field(default_factory=list)
 
 
@@ -108,6 +114,7 @@ def print_results(results: list[QuestionResult]) -> None:
 
         if r.has_answer:
             print(f"       Quellen   : {source_sym}  ({len(r.sources)} Quelle(s): {', '.join(r.sources[:2])}{'...' if len(r.sources) > 2 else ''})")
+            print(f'       Scores    : top={r.top_score:.3f}  ø={r.avg_score:.3f}')
             print(f'       Keywords  : {recall_str}')
             print(f"       Antwort    : {r.answer_text[:120]}{'...' if len(r.answer_text) > 120 else ''}")
         else:
@@ -128,6 +135,8 @@ def print_summary(report: EvaluationReport) -> None:
           f'(bei beantworteten Fragen)')
     print(f'  Ø Keyword-Recall      : {report.average_keyword_recall:.0%}')
     print(f'  Ø Laufzeit            : {report.average_runtime_sec:.2f}s pro Frage')
+    print(f'  Ø Top-Score           : {report.average_top_score:.3f}  (beantwortete Fragen)')
+    print(f'  Ø Ø-Score             : {report.average_avg_score:.3f}  (beantwortete Fragen)')
 
     # Breakdown by category
     categories: dict[str, list[QuestionResult]] = {}
@@ -202,6 +211,14 @@ def calculate_report_metrics(report: EvaluationReport) -> None:
     )
     report.average_runtime_sec = (
         sum(e.runtime_sec for e in report.results) / n
+    )
+
+    answered = [e for e in report.results if e.has_answer]
+    report.average_top_score = (
+        sum(e.top_score for e in answered) / len(answered) if answered else 0.0
+    )
+    report.average_avg_score = (
+        sum(e.avg_score for e in answered) / len(answered) if answered else 0.0
     )
 
 def main() -> None:
@@ -289,12 +306,15 @@ def main() -> None:
 
             result.has_answer = answer.has_evidence
             result.answer_text = answer.text
-            
-            # Using 'p.' instead of 'S.' for pages
             result.sources = list({
-                f'{chunk.source} S.{chunk.page}' if chunk.page else chunk.source
-                for chunk in answer.sources
+                f'{sc.chunk.source} S.{sc.chunk.page}' if sc.chunk.page else sc.chunk.source
+                for sc in answer.sources
             })
+
+            if answer.sources:
+                scores = [sc.score for sc in answer.sources]
+                result.top_score = max(scores)
+                result.avg_score = sum(scores) / len(scores)
 
         except Exception as exc:
             result.runtime_sec = 0.0

@@ -210,7 +210,7 @@ def _print_comparison(results: list[SweepResult]) -> None:
 
     # Header
     col = 10
-    tk_w = 36  # width per top_k group
+    tk_w = 50  # width per top_k group
     print(f"  {'':>{col}}  ", end='')
     for top_k in TOP_K_VALUES:
         label = f'top_k={top_k}'
@@ -219,12 +219,12 @@ def _print_comparison(results: list[SweepResult]) -> None:
 
     print(f"  {'Chunk':<{col}}  ", end='')
     for _ in TOP_K_VALUES:
-        print(f"  {'Guardrail':>9} {'Quellen':>7} {'Keywords':>8} {'Ø Zeit':>6}  ", end='')
+        print(f"  {'Guardrail':>9} {'Quellen':>7} {'Keywords':>8} {'TopScore':>9} {'ØScore':>7} {'Ø Zeit':>6}  ", end='')
     print()
 
     print(f"  {'─'*col}  ", end='')
     for _ in TOP_K_VALUES:
-        print(f"  {'─'*9} {'─'*7} {'─'*8} {'─'*6}  ", end='')
+        print(f"  {'─'*9} {'─'*7} {'─'*8} {'─'*9} {'─'*7} {'─'*6}  ", end='')
     print()
 
     # Rows grouped by chunk config
@@ -238,11 +238,13 @@ def _print_comparison(results: list[SweepResult]) -> None:
                     f"  {r.guardrail_accuracy:>8.0%} "
                     f"{r.source_citation_rate:>7.0%} "
                     f"{r.average_keyword_recall:>8.0%} "
+                    f"{r.average_top_score:>9.3f} "
+                    f"{r.average_avg_score:>7.3f} "
                     f"{r.average_runtime_sec:>5.1f}s  ",
                     end=''
                 )
             else:
-                print(f"  {'–':>8} {'–':>7} {'–':>8} {'–':>6}  ", end='')
+                print(f"  {'–':>8} {'–':>7} {'–':>8} {'–':>9} {'–':>7} {'–':>6}  ", end='')
         print()
 
     # File list

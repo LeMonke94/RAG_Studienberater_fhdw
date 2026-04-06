@@ -43,6 +43,6 @@ class AnswerUseCase:
 
         return Answer(
             text=answer_text,
-            sources=[sc.chunk for sc in result.scored_chunks],
+            sources=result.scored_chunks,
             has_evidence=True,
         )

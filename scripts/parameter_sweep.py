@@ -12,7 +12,7 @@ Ergebnisse:
     data/evaluation/top_k_5/sweep_<chunk>.json
     data/evaluation/top_k_10/sweep_<chunk>.json
 
-HINWEIS: Ein Durchlauf dauert ~10-20 Minuten (Ingest + 2 × 42 Fragen).
+HINWEIS: Ein Durchlauf dauert ~10-20 Minuten (Ingest + 2 * ca 40 Fragen).
          Bei 3 Chunk-Configs = ~30-60 Minuten Gesamtlaufzeit.
 
 Verwendung:
@@ -104,19 +104,22 @@ def run_sweep(testset_path: str, pdf_folder: str, url_json: str, output_base_dir
 
         # Ingest once for this chunk config
         print(f"\n  Ingest PDFs aus '{pdf_folder}'...")
+        pdf_stats = None
         try:
-            container.ingest_use_case.execute_folder(pdf_folder)
+            pdf_stats = container.ingest_use_case.execute_folder(pdf_folder)
         except Exception as e:
             print(f'  WARNUNG: PDF-Ingest fehlgeschlagen: {e}')
 
         print(f"  Ingest URLs aus '{url_json}'...")
+        url_stats = None
         try:
-            container.ingest_use_case.execute_urls_from_file(url_json)
+            url_stats = container.ingest_use_case.execute_urls_from_file(url_json)
         except Exception as e:
             print(f'  WARNUNG: URL-Ingest fehlgeschlagen: {e}')
 
         ingest_duration = time.perf_counter() - ingest_start
-        print(f'  Ingest abgeschlossen in {ingest_duration/60:.1f} Minuten.\n')
+        print(f'  Ingest abgeschlossen in {ingest_duration/60:.1f} Minuten.')
+        _print_ingest_stats(pdf_stats, url_stats)
 
         # Evaluate for each top_k — no re-ingest needed
         for top_k in TOP_K_VALUES:
@@ -132,6 +135,8 @@ def run_sweep(testset_path: str, pdf_folder: str, url_json: str, output_base_dir
                 testset_path=testset_path,
                 output_dir=output_dir,
                 config_name=chunk_config.name,
+                pdf_stats=pdf_stats,
+                url_stats=url_stats,
             )
             all_results.append(SweepResult(chunk_config, top_k, path, report))
             print(f'  Ergebnis gespeichert: {path}\n')
@@ -139,8 +144,26 @@ def run_sweep(testset_path: str, pdf_folder: str, url_json: str, output_base_dir
     _print_comparison(all_results)
 
 
+def _print_ingest_stats(pdf_stats, url_stats) -> None:
+    """Gibt eine kompakte Ingest-Übersicht aus."""
+    from rag_studienberater.application.use_cases.ingest_use_case import IngestStats
+
+    def _row(label: str, stats: IngestStats) -> None:
+        skip_pct = f'{stats.skip_rate:.0%}' if stats.total_chunks > 0 else '—'
+        failed = f'  ({len(stats.failed_documents)} Dok. fehlgeschlagen)' if stats.failed_documents else ''
+        print(f'  {label:<6}  {stats.ingested_chunks:>5}/{stats.total_chunks:<5} Chunks ingested'
+              f'  ({stats.skipped_chunks} übersprungen, {skip_pct}){failed}')
+
+    print()
+    if pdf_stats:
+        _row('PDFs', pdf_stats)
+    if url_stats:
+        _row('URLs', url_stats)
+    print()
+
+
 def _create_container(chunk_config: ChunkConfig, top_k: int):
-    """Creates a container with the given chunk config and top_k."""
+    """Erstellt den Container mit passenden Metriken."""
     import os
     os.environ['CHUNKING__CHUNK_SIZE']    = str(chunk_config.chunk_size)
     os.environ['CHUNKING__CHUNK_OVERLAP'] = str(chunk_config.chunk_overlap)
@@ -154,13 +177,30 @@ def _create_container(chunk_config: ChunkConfig, top_k: int):
 
 
 def _run_evaluation(
-    container, testset_path: str, output_dir: str, config_name: str
+    container, testset_path: str, output_dir: str, config_name: str,
+    pdf_stats=None, url_stats=None,
 ) -> tuple[str, EvaluationReport]:
-    """Runs evaluation for one container configuration and returns (file_path, report)."""
+    """Startet evaluation für den Container."""
+    from evaluate import IngestSummary
+
     questions = load_testset(testset_path)
+
+    ingest_summary = IngestSummary()
+    if pdf_stats:
+        ingest_summary.pdf_total_chunks     = pdf_stats.total_chunks
+        ingest_summary.pdf_ingested_chunks  = pdf_stats.ingested_chunks
+        ingest_summary.pdf_skipped_chunks   = pdf_stats.skipped_chunks
+        ingest_summary.pdf_failed_documents = pdf_stats.failed_documents
+    if url_stats:
+        ingest_summary.url_total_chunks     = url_stats.total_chunks
+        ingest_summary.url_ingested_chunks  = url_stats.ingested_chunks
+        ingest_summary.url_skipped_chunks   = url_stats.skipped_chunks
+        ingest_summary.url_failed_documents = url_stats.failed_documents
+
     report = EvaluationReport(
         timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         testset_path=testset_path,
+        ingest=ingest_summary,
     )
 
     for i, question_data in enumerate(questions, start=1):
@@ -181,9 +221,14 @@ def _run_evaluation(
             result.has_answer   = answer.has_evidence
             result.answer_text  = answer.text
             result.sources      = list({
-                f'{chunk.source} S.{chunk.page}' if chunk.page else chunk.source
-                for chunk in answer.sources
+                f'{sc.chunk.source} S.{sc.chunk.page}' if sc.chunk.page else sc.chunk.source
+                for sc in answer.sources
             })
+
+            if answer.sources:
+                scores = [sc.score for sc in answer.sources]
+                result.top_score = max(scores)
+                result.avg_score = sum(scores) / len(scores)
         except Exception as exc:
             result.answer_text = f'[FEHLER: {exc}]'
 
@@ -203,7 +248,7 @@ def _run_evaluation(
 
 
 def _print_comparison(results: list[SweepResult]) -> None:
-    """Prints a grouped comparison table: chunk configs as rows, top_k as column groups."""
+    """Zeigt eine Tabelle mit den Werten."""
     print(f"\n\n{'═' * 80}")
     print('  VERGLEICH ALLER KONFIGURATIONEN')
     print(f"{'═' * 80}\n")

@@ -47,9 +47,22 @@ class QuestionResult:
     notes: str = ""
 
 @dataclass
+class IngestSummary:
+    """Kompakte Ingest-Statistik für die Ergebnisdatei."""
+    pdf_total_chunks: int = 0
+    pdf_ingested_chunks: int = 0
+    pdf_skipped_chunks: int = 0
+    pdf_failed_documents: list[str] = field(default_factory=list)
+    url_total_chunks: int = 0
+    url_ingested_chunks: int = 0
+    url_skipped_chunks: int = 0
+    url_failed_documents: list[str] = field(default_factory=list)
+
+@dataclass
 class EvaluationReport:
     timestamp: str
     testset_path: str
+    ingest: IngestSummary = field(default_factory=IngestSummary)
     total_questions: int = 0
     guardrail_accuracy: float = 0.0
     source_citation_rate: float = 0.0

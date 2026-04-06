@@ -24,6 +24,11 @@ class GuardrailService:
 
         return any(sc.score >= self.min_score for sc in result.scored_chunks)
 
+    def filter_chunks(self, result: RetrievalResult) -> RetrievalResult:
+        """Gibt ein neues RetrievalResult zurück, das nur Chunks über dem min_score enthält."""
+        filtered = [sc for sc in result.scored_chunks if sc.score >= self.min_score]
+        return RetrievalResult(scored_chunks=filtered)
+
     def get_no_evidence_response(self) -> str:
         """Gibt eine Standardantwort zurück, wenn keine ausreichenden Informationen vorhanden sind."""
 

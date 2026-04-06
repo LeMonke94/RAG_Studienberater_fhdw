@@ -2,6 +2,7 @@
 import json
 import logging
 import math
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..services import ChunkingService, TextCleanerService
@@ -9,6 +10,23 @@ from ...domain.ports import DocumentLoaderPort, EmbeddingPort, VectorStorePort
 
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class IngestStats:
+    """Statistiken eines Ingest-Laufs (Ordner oder URL-Liste)."""
+    total_chunks: int = 0
+    skipped_chunks: int = 0
+    failed_documents: list[str] = field(default_factory=list)
+
+    @property
+    def ingested_chunks(self) -> int:
+        return self.total_chunks - self.skipped_chunks
+
+    @property
+    def skip_rate(self) -> float:
+        return self.skipped_chunks / self.total_chunks if self.total_chunks > 0 else 0.0
+
 
 class IngestUseCase:
 
@@ -19,9 +37,11 @@ class IngestUseCase:
         self.embedder = embedder
         self.vector_store = vector_store
 
-    def execute_document(self, source: str) -> None:
-        """Lädt, bereinigt, chunked, embeddet und speichert ein Dokument."""
+    def execute_document(self, source: str) -> tuple[int, int]:
+        """Lädt, bereinigt, chunked, embeddet und speichert ein Dokument.
 
+        Gibt (total_chunks, skipped_chunks) zurück.
+        """
         document = self.loader.load(source)
 
         for page in document.pages:
@@ -31,23 +51,26 @@ class IngestUseCase:
         chunks = [c for c in chunks if len(c.text.strip()) >= 20]
         if not chunks:
             logger.warning(f'Keine verwertbaren Chunks für {source} — übersprungen.')
-            return
+            return 0, 0
 
-        valid_chunks, valid_vectors = self._embed_with_validation(chunks, source)
+        valid_chunks, valid_vectors, skipped = self._embed_with_validation(chunks, source)
 
         if not valid_chunks:
             logger.warning(f'Keine gültigen Vektoren für {source} — übersprungen.')
-            return
+            return len(chunks), len(chunks)
 
         self.vector_store.add_chunks(chunks=valid_chunks, vectors=valid_vectors)
+        return len(chunks), skipped
 
     def _embed_with_validation(
         self, chunks: list, source: str
-    ) -> tuple[list, list]:
+    ) -> tuple[list, list, int]:
         """Embeddet jeden Chunk einzeln und filtert ungültige Vektoren heraus.
 
         Durch einzelnes Embedding wird verhindert, dass ein problematischer Chunk
         den gesamten Batch scheitern lässt.
+
+        Gibt (valid_chunks, valid_vectors, skipped_count) zurück.
         """
         valid_chunks = []
         valid_vectors = []
@@ -71,13 +94,12 @@ class IngestUseCase:
         if skipped > 0:
             logger.warning(f'{skipped}/{len(chunks)} Chunks für {source} übersprungen.')
 
-        return valid_chunks, valid_vectors
+        return valid_chunks, valid_vectors, skipped
 
-    def execute_folder(self, folder: str) -> None:
+    def execute_folder(self, folder: str) -> IngestStats:
         """PDFs aus einem Ordner und allen Unterordnern einlesen und im Vector-Store speichern."""
-
+        stats = IngestStats()
         folder_path = Path(folder)
-
         files = list(folder_path.rglob('*.pdf'))
 
         logger.info(f'{len(files)} PDFs gefunden in {folder} (inkl. Unterordner)')
@@ -85,29 +107,39 @@ class IngestUseCase:
         for file_path in files:
             logger.info(f'Verarbeite: {file_path.name}')
             try:
-                self.execute_document(str(file_path))
+                total, skipped = self.execute_document(str(file_path))
+                stats.total_chunks += total
+                stats.skipped_chunks += skipped
                 logger.info(f'{file_path.name} erfolgreich verarbeitet.')
             except Exception as e:
                 logger.warning(f'{file_path.name} konnte nicht verarbeitet werden: {e}')
+                stats.failed_documents.append(file_path.name)
 
-    def execute_urls(self, urls: list[str]) -> None:
+        return stats
+
+    def execute_urls(self, urls: list[str]) -> IngestStats:
         """Webseiten einlesen und im Vector-Store speichern."""
+        stats = IngestStats()
 
         for url in urls:
             logger.info(f'Verarbeite: {url}')
             try:
-                self.execute_document(url)
+                total, skipped = self.execute_document(url)
+                stats.total_chunks += total
+                stats.skipped_chunks += skipped
                 logger.info(f'{url} erfolgreich verarbeitet.')
             except Exception as e:
                 logger.warning(f'{url} konnte nicht verarbeitet werden: {e}')
+                stats.failed_documents.append(url)
 
-    def execute_urls_from_file(self, json_path: str) -> None:
+        return stats
+
+    def execute_urls_from_file(self, json_path: str) -> IngestStats:
         """URLs aus einer JSON-Datei einlesen und im Vector-Store speichern."""
-
         path = Path(json_path)
         with path.open(encoding='utf-8') as f:
             data = json.load(f)
 
         urls: list[str] = data.get('urls', [])
         logger.info(f'{len(urls)} URLs gefunden in {json_path}')
-        self.execute_urls(urls)
+        return self.execute_urls(urls)

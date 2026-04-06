@@ -21,7 +21,7 @@ class ChunkingSettings(BaseModel):
     top_k: int = Field(default=10, gt=0)
 
 class GuardrailSettings(BaseModel):
-    min_score: float = Field(default=0.65, ge=0.0, le=1.0)
+    min_score: float = Field(default=0.6, ge=0.0, le=1.0)
 
 class LoggingSettings(BaseModel):
     level: str = 'INFO'

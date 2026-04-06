@@ -38,11 +38,12 @@ class AnswerUseCase:
                 has_evidence=False,
             )
 
-        prompt = self.grounding_service.build_prompt(query, result)
+        filtered = self.guardrail_service.filter_chunks(result)
+        prompt = self.grounding_service.build_prompt(query, filtered)
         answer_text = self.language_model.generate(prompt)
 
         return Answer(
             text=answer_text,
-            sources=result.scored_chunks,
+            sources=filtered.scored_chunks,
             has_evidence=True,
         )

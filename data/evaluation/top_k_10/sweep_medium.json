@@ -33,8 +33,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -51,8 +51,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -71,9 +71,9 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
-      "notes": ""
+      "correctness": 2,
+      "completeness": 1,
+      "notes": "Eine seite wird nicht als Quelle genannt."
     },
     {
       "id": "Q04",
@@ -89,8 +89,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 1,
+      "completeness": 1,
       "notes": ""
     },
     {
@@ -109,9 +109,9 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.6666666666666666,
-      "correctness": -1,
-      "completeness": -1,
-      "notes": ""
+      "correctness": 0,
+      "completeness": 0,
+      "notes": "Halutination?"
     },
     {
       "id": "Q06",
@@ -127,9 +127,9 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
-      "notes": ""
+      "correctness": 0,
+      "completeness": 0,
+      "notes": "Es steht zwar was man tun soll und was nicht / wird aber etwas unklar formuliert."
     },
     {
       "id": "Q07",
@@ -145,9 +145,9 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
-      "notes": ""
+      "correctness": 2,
+      "completeness": 2,
+      "notes": "Steht tatsächlich nicht im Dokument."
     },
     {
       "id": "Q08",
@@ -166,8 +166,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -186,9 +186,9 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.6666666666666666,
-      "correctness": -1,
-      "completeness": -1,
-      "notes": ""
+      "correctness": 1,
+      "completeness": 1,
+      "notes": "AI und Informatik fehlen"
     },
     {
       "id": "Q10",
@@ -207,9 +207,9 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.6666666666666666,
-      "correctness": -1,
-      "completeness": -1,
-      "notes": ""
+      "correctness": 2,
+      "completeness": 1,
+      "notes": "Einen von 2 erkannt."
     },
     {
       "id": "Q11",
@@ -233,9 +233,9 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.5,
-      "correctness": -1,
-      "completeness": -1,
-      "notes": ""
+      "correctness": 1,
+      "completeness": 1,
+      "notes": "Besser als vorher"
     },
     {
       "id": "Q12",
@@ -251,9 +251,9 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
-      "notes": ""
+      "correctness": 0,
+      "completeness": 0,
+      "notes": "Es gibt Informationen dazu."
     },
     {
       "id": "Q13",
@@ -280,8 +280,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 1,
+      "completeness": 1,
       "notes": ""
     },
     {
@@ -307,8 +307,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 1,
       "notes": ""
     },
     {
@@ -332,8 +332,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.5,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 1,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -352,8 +352,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -370,8 +370,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -399,8 +399,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -423,9 +423,9 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.5,
-      "correctness": -1,
-      "completeness": -1,
-      "notes": ""
+      "correctness": 0,
+      "completeness": 2,
+      "notes": "Man kann erkennen, dass die Tabelle nicht von unten nach oben sondern von links nach rechts embedded wurde."
     },
     {
       "id": "Q20",
@@ -443,8 +443,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -472,8 +472,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -492,8 +492,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.5,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 1,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -521,8 +521,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -546,8 +546,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.5,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -568,8 +568,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 1,
       "notes": ""
     },
     {
@@ -586,8 +586,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -610,8 +610,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -628,8 +628,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -654,8 +654,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.6666666666666666,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -672,8 +672,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -701,8 +701,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 1,
+      "completeness": 1,
       "notes": ""
     },
     {
@@ -719,8 +719,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -739,8 +739,8 @@
       "guardrail_correct": false,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -759,8 +759,8 @@
       "guardrail_correct": false,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -777,8 +777,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -795,8 +795,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -813,8 +813,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -831,8 +831,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -849,8 +849,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -867,8 +867,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -885,8 +885,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -903,8 +903,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     }
   ]

@@ -33,8 +33,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -51,8 +51,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -76,8 +76,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.3333333333333333,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -96,8 +96,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.6666666666666666,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -116,8 +116,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -134,8 +134,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -152,8 +152,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -175,8 +175,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -195,9 +195,9 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.6666666666666666,
-      "correctness": -1,
-      "completeness": -1,
-      "notes": ""
+      "correctness": 1,
+      "completeness": 1,
+      "notes": "AI und Informatik fehlen"
     },
     {
       "id": "Q10",
@@ -216,9 +216,9 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.6666666666666666,
-      "correctness": -1,
-      "completeness": -1,
-      "notes": ""
+      "correctness": 1,
+      "completeness": 1,
+      "notes": "Einen von 2 erkannt."
     },
     {
       "id": "Q11",
@@ -242,8 +242,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 1,
       "notes": ""
     },
     {
@@ -260,8 +260,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -288,8 +288,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.6666666666666666,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 1,
       "notes": ""
     },
     {
@@ -314,8 +314,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 1,
       "notes": ""
     },
     {
@@ -334,8 +334,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.5,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -354,8 +354,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -372,8 +372,8 @@
       "guardrail_correct": false,
       "has_sources": false,
       "keyword_recall": 0.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -397,8 +397,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 1,
       "notes": ""
     },
     {
@@ -424,8 +424,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -447,8 +447,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -476,8 +476,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -497,8 +497,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.5,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 1,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -525,8 +525,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 1,
+      "completeness": 1,
       "notes": ""
     },
     {
@@ -553,8 +553,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.25,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 0,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -578,8 +578,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 1,
+      "completeness": 0,
       "notes": ""
     },
     {
@@ -602,8 +602,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 1,
+      "completeness": 1,
       "notes": ""
     },
     {
@@ -623,8 +623,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.5,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -646,8 +646,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.75,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -672,8 +672,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -694,8 +694,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.6666666666666666,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 1,
+      "completeness": 1,
       "notes": ""
     },
     {
@@ -721,8 +721,8 @@
       "guardrail_correct": true,
       "has_sources": true,
       "keyword_recall": 0.3333333333333333,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -739,8 +739,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -757,8 +757,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -777,8 +777,8 @@
       "guardrail_correct": false,
       "has_sources": true,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -795,8 +795,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -813,8 +813,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -831,8 +831,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -849,8 +849,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -867,8 +867,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -885,8 +885,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -903,8 +903,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     },
     {
@@ -921,8 +921,8 @@
       "guardrail_correct": true,
       "has_sources": false,
       "keyword_recall": 1.0,
-      "correctness": -1,
-      "completeness": -1,
+      "correctness": 2,
+      "completeness": 2,
       "notes": ""
     }
   ]

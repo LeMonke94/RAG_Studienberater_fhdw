@@ -746,7 +746,7 @@
       "notes": ""
     },
     {
-      "id": "Q36",
+      "id": "Q35",
       "category": "off_topic",
       "question": "Was ist die Hauptstadt von Frankreich?",
       "expected_answer": false,
@@ -764,7 +764,7 @@
       "notes": ""
     },
     {
-      "id": "Q37",
+      "id": "Q36",
       "category": "off_topic",
       "question": "Kannst du mir ein Rezept für Spaghetti Carbonara empfehlen?",
       "expected_answer": false,
@@ -782,7 +782,7 @@
       "notes": ""
     },
     {
-      "id": "Q38",
+      "id": "Q37",
       "category": "off_topic",
       "question": "Wer hat die letzte Fußball-Weltmeisterschaft gewonnen?",
       "expected_answer": false,
@@ -800,7 +800,7 @@
       "notes": ""
     },
     {
-      "id": "Q39",
+      "id": "Q38",
       "category": "off_topic",
       "question": "Schreibe mir ein Python-Skript zum Sortieren einer Liste.",
       "expected_answer": false,
@@ -818,7 +818,7 @@
       "notes": ""
     },
     {
-      "id": "Q40",
+      "id": "Q39",
       "category": "off_topic",
       "question": "Erkläre mir die Quantenmechanik.",
       "expected_answer": false,
@@ -836,7 +836,7 @@
       "notes": ""
     },
     {
-      "id": "Q41",
+      "id": "Q40",
       "category": "off_topic",
       "question": "Wie investiere ich am besten in ETFs?",
       "expected_answer": false,
@@ -854,7 +854,7 @@
       "notes": ""
     },
     {
-      "id": "Q42",
+      "id": "Q41",
       "category": "off_topic",
       "question": "Welche Hochschulen in NRW sind besser als die FHDW?",
       "expected_answer": false,
@@ -872,7 +872,7 @@
       "notes": ""
     },
     {
-      "id": "Q43",
+      "id": "Q42",
       "category": "off_topic",
       "question": "Wie wird das Wetter morgen in Bielefeld?",
       "expected_answer": false,
